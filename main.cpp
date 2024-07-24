@@ -1599,11 +1599,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			DispatchMessage(&msg);
 		}
 		else {
-			//-------------------------------------
-			//入力処理の更新
-			//-------------------------------------
-
-			input->Update();
 
 			//-------------------------------------
 			//CBufferの中身を更新する
@@ -1856,6 +1851,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();
+	delete input;
 
 #ifdef _DEBUG
 	//debugController->Release();
