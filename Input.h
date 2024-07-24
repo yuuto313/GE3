@@ -25,19 +25,7 @@ public:
 	/// </summary>
 	void Update();
 
-	/// <summary>
-	/// キーの押下をチェック
-	/// </summary>
-	/// <param name="keyNumber"></param>
-	/// <returns></returns>
-	bool PushKey(BYTE keyNumber);
 
-	/// <summary>
-	/// キーのトリガーをチェック
-	/// </summary>
-	/// <param name="keyNumber"></param>
-	/// <returns></returns>
-	bool TriggerKey(BYTE keyNumber);
 private:
 	//DirectInputのインスタンス生成
 	ComPtr<IDirectInput8> directInput;
@@ -45,10 +33,5 @@ private:
 	//キーボードデバイス生成
 	ComPtr<IDirectInputDevice8> keyboard;
 
-	//全キーの状態
-	BYTE key[256] = {};
-
-	//前回の全キーの状態
-	BYTE keyPre[256] = {};
 };
 
