@@ -56,8 +56,7 @@ public:
 	/// <param name="texture"></param>
 	/// <param name="mipImages"></param>
 	/// <returns></returns>
-	[[nodiscard]]
-	Microsoft::WRL::ComPtr<ID3D12Resource> UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
+	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
 
 	/// <summary>
 	/// テクスチャファイルの読み込み
