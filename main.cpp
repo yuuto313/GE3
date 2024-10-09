@@ -36,6 +36,8 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include "Logger.h"
 #include "StringUtility.h"
 #include "D3DResourceLeakChecker.h"
+#include "Object3dCommon.h"
+#include "Object.h"
 #include "MyMath.h"
 
 typedef struct {
@@ -274,6 +276,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	DirectXCommon* dxCommon = nullptr;
 	SpriteCommon* spriteCommon = nullptr;	
 	Sprite* sprite = nullptr;
+	Object3dCommon* object3dCommon = nullptr;
+	Object* object3d = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -312,13 +316,33 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	spriteCommon->Initialize();
 
 	//-------------------------------------
+	// 3Dオブジェクト共通部の初期化
+	//-------------------------------------
+
+	object3dCommon = new Object3dCommon();
+	object3dCommon->Initialize();
+
+
+#pragma endregion 基盤システムの初期化
+
+#pragma region 最初のシーンの初期化
+
+	//-------------------------------------
 	// スプライトの初期化
 	//-------------------------------------
 
 	sprite = new Sprite();
 	sprite->Initialize();
 
-#pragma endregion 基盤システムの初期化
+	//-------------------------------------
+	// 3Dオブジェクトの初期化
+	//-------------------------------------
+
+	object3d = new Object();
+	object3d->Initialize();
+
+
+#pragma endregion 最初のシーンの終了
 
 #ifdef _DEBUG
 
@@ -1006,7 +1030,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	}
 	pixelShaderBlob->Release();
 	vertexShaderBlob->Release();*/
+	delete object3d;
 	delete sprite;
+	delete object3dCommon;
 	delete spriteCommon;
 	delete dxCommon;
 	delete input;
