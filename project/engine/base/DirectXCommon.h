@@ -61,6 +61,7 @@ public:
 	/// <returns></returns>
 	void UploadTextureData(const Microsoft::WRL::ComPtr<ID3D12Resource>& texture, const DirectX::ScratchImage& mipImages);
 
+
 	/// <summary>
 	/// 初期化
 	/// </summary>

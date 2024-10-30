@@ -248,7 +248,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	Audio* pAudio = nullptr;
 	ImGuiManager* pImguiManager = nullptr;
 	SpriteCommon* pSpriteCommon = nullptr;	
-	std::vector<Sprite*> pSprites;
+	Sprite* pSprite = nullptr;
 
 #pragma region 基盤システムの初期化
 
@@ -280,13 +280,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	pDxCommon->Initialize(pWinApp);
 
 	//-------------------------------------
-	// テクスチャマネージャの初期化
-	//-------------------------------------
-
-	TextureManager::GetInstance()->Initialize(pDxCommon);
-	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
-	
-	//-------------------------------------
 	// Audioの初期化
 	//-------------------------------------
 
@@ -311,16 +304,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// スプライトの初期化
 	//-------------------------------------
 
-	for (uint32_t i = 0; i < 3; ++i) {
-		Sprite* pSprite = new Sprite();
-		pSprite->Initialize(pSpriteCommon, pDxCommon, "resource/uvChecker.png");
+	std::string filePath = "resource/uvChecker.png";
 
-		Vector2 position = pSprite->GetPosition();
-		position = Vector2(i * 300.0f, i + 50.0f);
-		pSprite->SetPosition(position);
+	pSprite = new Sprite();
+	pSprite->Initialize(pSpriteCommon, pDxCommon,filePath);
+	
 
-		pSprites.push_back(pSprite);
-	}
+	//-------------------------------------
+	// テクスチャマネージャの初期化
+	//-------------------------------------
+
+	TextureManager::GetInstance()->Initialize(pDxCommon);
 
 #pragma endregion 基盤システムの初期化
 
@@ -393,6 +387,65 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	directionalLightData->direction = MyMath::Normalize({ 0.0f,-1.0f,0.0f });
 	directionalLightData->intensity = 1.0f;
 
+	////-------------------------------------
+ //   //Textureを読んで転送する
+ //   //-------------------------------------
+
+	//DirectX::ScratchImage mipImages = pDxCommon->LoadTexture("resource/uvChecker.png");
+	//const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
+	//Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = pDxCommon->CreateTextureResource(metadata);
+	//pDxCommon->UploadTextureData(textureResource, mipImages);
+
+	////-------------------------------------
+	////二枚目のTextureを読んで転送する
+	////-------------------------------------
+
+	////DirectX::ScratchImage mipImages2 = LoadTexture("resource/monsterBall.png");
+	//DirectX::ScratchImage mipImages2 = pDxCommon->LoadTexture("resource/uvChecker.png");
+	//const DirectX::TexMetadata& metadata2 = mipImages2.GetMetadata();
+	//Microsoft::WRL::ComPtr<ID3D12Resource> textureResource2 = pDxCommon->CreateTextureResource(metadata2);
+	//pDxCommon->UploadTextureData(textureResource2, mipImages2);
+
+	////-------------------------------------
+ //   //ShaderResourceViewを作る
+ //   //-------------------------------------
+
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc{};
+	//srvDesc.Format = metadata.format;
+	//srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	//srvDesc.Texture2D.MipLevels = UINT(metadata.mipLevels);
+
+	////SRVを作成するDescriptorHeapの場所を決める
+	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = pDxCommon->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = pDxCommon->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+
+	////先頭はImGuiが使っているのでその次を使う
+	//textureSrvHandleCPU.ptr += pDxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	//textureSrvHandleGPU.ptr += pDxCommon->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+
+	////SRVの生成
+	//pDxCommon->GetDevice()->CreateShaderResourceView(textureResource.Get(), &srvDesc, textureSrvHandleCPU);
+
+	////-------------------------------------
+	////二枚目のShaderResourceViewを作る
+	////-------------------------------------
+
+	//D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc2{};
+	//srvDesc2.Format = metadata2.format;
+	//srvDesc2.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	//srvDesc2.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;//２Dテクスチャ
+	//srvDesc2.Texture2D.MipLevels = UINT(metadata2.mipLevels);
+
+	////SRVを作成するDescriptorHeapの場所を決める
+	////index = 2の位置にDescriptorを作成する
+	//D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU2 = GetCPUDescriptorHandle(pDxCommon->GetSrvDescriptorHeap(), pDxCommon->GetDescriptorSizeSRV(), 2);
+	//D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU2 = GetGPUDescriptorHandle(pDxCommon->GetSrvDescriptorHeap(), pDxCommon->GetDescriptorSizeSRV(), 2);
+
+	////SRVの生成
+	//pDxCommon->GetDevice()->CreateShaderResourceView(textureResource2.Get(), &srvDesc2, textureSrvHandleCPU2);
+
+	
 	//テクスチャ切り替え用のbool変数
 	bool useMonsterBall = true;
 
@@ -418,12 +471,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// スプライトの更新
 		//-------------------------------------
 		
-		for (uint32_t i = 0; i < pSprites.size(); ++i) {
-			pSprites[i]->Update();
-			float rotation = pSprites[i]->GetRotation();
-			rotation += 0.01f;
-			pSprites[i]->SetRotation(rotation);
-		}
+	
+		pSprite->Update();		
+		
 		//-------------------------------------
 		//ゲームの更新処理でパラメータを変更したいタイミングでImGuiの処理を行う
 		//-------------------------------------
@@ -432,12 +482,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		pImguiManager->UpdateGameUI();
 		pSpriteCommon->ImGui();
 
-		for (uint32_t i = 0; i < pSprites.size(); ++i) {
-			pSprites[i]->ImGui();
-		}
+		pSprite->ImGui();
 	
+
 		//-------------------------------------
-		// ライトの向きを正規化
+		//ライトの向きを正規化
 		//-------------------------------------
 
 		directionalLightData->direction = MyMath::Normalize(directionalLightData->direction);
@@ -456,9 +505,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// Sprite個々の描画
 		//-------------------------------------
 		
-		for (uint32_t i = 0; i < pSprites.size(); ++i) {
-			pSprites[i]->Draw(directionalLightResource);
-		}
+		pSprite->Draw(directionalLightResource);
+
 		//-------------------------------------
 		//ゲームの処理が終わり描画処理に入る前に、ImGuiの内部コマンドを生成する
 		//-------------------------------------
@@ -513,9 +561,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
     // 解放処理
     //-------------------------------------
 
-	for (uint32_t i = 0; i < pSprites.size(); ++i) {
-		delete pSprites[i];
-	}
+	
+	delete pSprite;
 	delete pSpriteCommon;
 	delete pImguiManager;
 	delete pAudio;
