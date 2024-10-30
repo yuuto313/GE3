@@ -229,16 +229,15 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 					std::getline(v, index, '/');
 					elementIndices[element] = std::stoi(index);
 				}
+
 				//要素へのIndexから、実際の要素の値を取得して、頂点を構築する
 				Vector4 position = positions[elementIndices[0] - 1];
 				Vector2 texcoord = texcoords[elementIndices[1] - 1];
 				Vector3 normal = normals[elementIndices[2] - 1];
+
 				//右手系から左手系へ変換するためｘを反転させる
-				//position.x *= -1.0f;
-				//normal.x *= -1.0f;
 				texcoord.y = 1.0f - texcoord.y;
-				//VertexData vertex = { position,texcoord,normal };
-				//modelData.verteces.push_back(vertex);
+				
 				triangle[faceVertex] = { position,texcoord,normal };
 			}
 			//頂点を逆順で登録することで、回り順を逆にする
