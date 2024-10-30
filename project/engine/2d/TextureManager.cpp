@@ -82,7 +82,6 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	textureData.filePath = filePath;
 	textureData.metadata = mipImages.GetMetadata();
 	textureData.resource = dxCommon_->CreateTextureResource(textureData.metadata);
-	dxCommon_->UploadTextureData(textureData.resource, mipImages);
 
 	//-------------------------------------
 	// デスクリプタハンドルの計算
@@ -105,18 +104,18 @@ void TextureManager::LoadTexture(const std::string& filePath)
 	srvDesc.Texture2D.MipLevels = UINT(textureData.metadata.mipLevels);
 
 	// SRVを作成するDescriptorHeapの場所を決める
-	textureData.srvHandleCPU = dxCommon_->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
-	textureData.srvHandleGPU = dxCommon_->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
+	D3D12_CPU_DESCRIPTOR_HANDLE textureSrvHandleCPU = dxCommon_->GetSrvDescriptorHeap()->GetCPUDescriptorHandleForHeapStart();
+	D3D12_GPU_DESCRIPTOR_HANDLE textureSrvHandleGPU = dxCommon_->GetSrvDescriptorHeap()->GetGPUDescriptorHandleForHeapStart();
 
 	// 先頭はImGuiが使っているのでその次を使う
-	textureData.srvHandleCPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-	textureData.srvHandleGPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleCPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	textureSrvHandleGPU.ptr += dxCommon_->GetDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	//-------------------------------------
 	// 設定を基にSRVの生成
 	//-------------------------------------
 
-	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureData.srvHandleCPU);
+	dxCommon_->GetDevice()->CreateShaderResourceView(textureData.resource.Get(), &srvDesc, textureSrvHandleCPU);
 
 }
 
@@ -133,12 +132,10 @@ uint32_t TextureManager::GetTextureIndexByFilePath(const std::string& filePath)
 		// 読み込み済みなら要素番号を返す
 		uint32_t textureIndex = static_cast<uint32_t>(std::distance(textureDatas_.begin(), it));
 		return textureIndex;
-	} else {
-		// 検索がヒットしない場合は事前に適切に読み込みをしていないので停止させる
-		assert(0);
-		return 0;
 	}
 
+	assert(0);
+	return 0;
 }
 
 D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureIndex)
@@ -149,16 +146,6 @@ D3D12_GPU_DESCRIPTOR_HANDLE TextureManager::GetSrvHandleGPU(uint32_t textureInde
 	// テクスチャデータの参照を取得
 	TextureData& textureData = textureDatas_[textureIndex];
 	return textureData.srvHandleGPU;
-}
-
-const DirectX::TexMetadata& TextureManager::GetMetaData(uint32_t textureIndex)
-{
-	// 範囲外指定違反チェック
-	assert(textureIndex < textureDatas_.size());
-
-	// テクスチャデータの参照を取得
-	TextureData& textureData = textureDatas_[textureIndex];
-	return textureData.metadata;
 }
 
 
