@@ -565,7 +565,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//BlendStateの設定
 	D3D12_BLEND_DESC blendDesc{};
-	BlendMode blendMode = kBlendModeAdd;
+	BlendMode blendMode = kBlendModeNormal;
 
 	SetBlendState(blendDesc, blendMode);
 
@@ -1110,6 +1110,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		ImGui::Checkbox("UpdateParticle", &isUpdate);
 
+		ImGui::SliderAngle("SphereTranslateX", &transform.translate.x);
+		ImGui::SliderAngle("SphereTranslateY", &transform.translate.y);
+		ImGui::SliderAngle("SphereTranslateZ", &transform.translate.z);
+
 		ImGui::SliderAngle("SphereRotateX", &transform.rotate.x);
 		ImGui::SliderAngle("SphereRotateY", &transform.rotate.y);
 		ImGui::SliderAngle("SphereRotateZ", &transform.rotate.z);
@@ -1157,6 +1161,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//マテリアルCBufferの場所を設定
 		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
+		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, wvpResource->GetGPUVirtualAddress());
 
 		//wvp用のCBufferの場所を設定
 		//RootParameter[1]に対してCBVの設定
