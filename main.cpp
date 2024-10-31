@@ -1161,7 +1161,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		//マテリアルCBufferの場所を設定
 		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource->GetGPUVirtualAddress());
-		dxCommon->GetCommandList()->SetGraphicsRootConstantBufferView(0, wvpResource->GetGPUVirtualAddress());
 
 		//wvp用のCBufferの場所を設定
 		//RootParameter[1]に対してCBVの設定
