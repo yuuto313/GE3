@@ -30,6 +30,11 @@ struct Vector3 final{
 		z += other.z;
 		return *this;  // 自身の参照を返す
 	}
+	
+	// Vector3 + Vector3
+	Vector3 operator+(const Vector3& other) const {
+		return Vector3(x + other.x, y + other.y, z + other.z);
+	}
 };
 
 
