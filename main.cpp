@@ -125,6 +125,13 @@ struct Emitter {
 	float frequencyTime;
 };
 
+struct AccelerationField {
+	// 加速度
+	Vector3 acceleration;
+	// 範囲
+	AABB area;
+};
+
 //-------------------------------------
 //DepthStencilTextureを作る
 //-------------------------------------
@@ -856,6 +863,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
 	
+	// エミッター
 	Emitter emitter{};
 	emitter.count = 3;
 	// 0.5秒ごとに発生
@@ -867,12 +875,17 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	emitter.transform.rotate = { 0.0f,0.0f,0.0f };
 	emitter.transform.translate = { 0.0f,0.0f,0.0f };
 
+	// パーティクル
 	std::list<Particle> particles;
 	particles.push_back(MakeNewParticle(randomEngine, emitter.transform.translate));
 	particles.push_back(MakeNewParticle(randomEngine, emitter.transform.translate));
 	particles.push_back(MakeNewParticle(randomEngine, emitter.transform.translate));
 
-	
+	// フィールド
+	AccelerationField accelerationFiled;
+	accelerationFiled.acceleration = { 15.0f,0.0f,0.0f };
+	accelerationFiled.area.min = { -1.0f,-1.0f,-1.0f };
+	accelerationFiled.area.max = { 1.0f,1.0f,1.0f };
 
 	//-------------------------------------
 	//VertexShaderで利用するtransformationMatrix用のResourceを作成
@@ -1052,6 +1065,11 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 				if ((*particleIterator).lifeTime <= (*particleIterator).currentTime) {
 					particleIterator = particles.erase(particleIterator);
 					continue;
+				}
+
+				// fieldの範囲内のParticleには加速度を適用する
+				if (MyMath::IsCollision(accelerationFiled.area, (*particleIterator).transform.translate)) {
+					(*particleIterator).velocity += accelerationFiled.acceleration * kDeltaTime;
 				}
 
 				// 最大数を超えて描画しないようにする

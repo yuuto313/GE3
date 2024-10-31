@@ -3,6 +3,7 @@
 #include <math.h>
 #include <cstdint>
 #include <format>
+#include <algorithm>
 
 //-------------------------------------
 // 構造体
@@ -35,6 +36,11 @@ struct Vector3 final{
 	Vector3 operator+(const Vector3& other) const {
 		return Vector3(x + other.x, y + other.y, z + other.z);
 	}
+	
+	// Vector3 - Vector3
+	Vector3 operator-(const Vector3& other) const {
+		return Vector3(x - other.x, y - other.y, z - other.z);
+	}
 };
 
 
@@ -52,6 +58,13 @@ struct Matrix3x3 final{
 
 struct Matrix4x4 final{
 	float m[4][4];
+};
+
+//直方体
+//Axis Aligned Bounding Box（軸平行境界箱）
+struct AABB {
+	Vector3 min;//最小点
+	Vector3 max;//最大点
 };
 
 //-------------------------------------
@@ -179,6 +192,8 @@ namespace MyMath{
 	/// <param name="farClip"></param>
 	/// <returns></returns>
 	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
+
+	bool IsCollision(const AABB& aabb, const Vector3& point);
 
 }
 

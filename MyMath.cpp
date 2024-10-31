@@ -188,3 +188,15 @@ Matrix4x4 MyMath::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float 
 	result.m[3][2] = (-nearClip * farClip) / (farClip - nearClip);
 	return result;
 }
+
+bool MyMath::IsCollision(const AABB& aabb, const Vector3& point)
+{
+	// 未来の自分へ。全くもって正しいという保証なしです
+	if ((aabb.min.x <= point.x && aabb.max.x >= point.x) && //x軸
+		(aabb.min.y <= point.y && aabb.max.y >= point.y) &&//y軸
+		(aabb.min.z <= point.z && aabb.max.z >= point.z)) {
+		return true;
+	} else {
+		return false;
+	}
+}
