@@ -872,8 +872,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	//zが-５の位置でｚ+の方向を向いているカメラ
-	Transform cameraTransform{ {1.0f,1.0f,1.0f},{std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float>,0.0f},{0.0f,23.0f,10.0f} };
-
+	Transform cameraTransform{ {1.0f,1.0f,1.0f},{std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float>,0.0f},{0.0f,23.0f,-10.0f} };
 
 	//-------------------------------------
 	//Textureを読んで転送する
@@ -1013,14 +1012,31 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		// 描画すべきインスタンス数
 		uint32_t numInstance = 0;
 
+		// 裏が見えているので反対側に回す回転行列を作成
+		Matrix4x4 backToFrontMatrix = MyMath::MakeRotateYMatrix(std::numbers::pi_v<float>);
+		// 常にカメラのの方を向く板ポリの行列（BillboardMatrix）を作成
+		Matrix4x4 billboardMatrix = MyMath::Multiply(backToFrontMatrix, cameraMatrix);
+		// 平行移動成分はいらない
+		billboardMatrix.m[3][0] = 0.0f;
+		billboardMatrix.m[3][1] = 0.0f;
+		billboardMatrix.m[3][2] = 0.0f;
+
 		for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 			// 生存時間を過ぎていたら更新せず描画対象にしない
 			if (particles[index].lifeTime <= particles[index].currentTime) {
 				continue;
 			}
 			
-			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
-			Matrix4x4 backToFrontMatrix = MyMath::MakeRotateYMatrix(std::numbers::pi_v<float>);
+			Matrix4x4 scaleMatrix = MyMath::MakeScaleMatrix(particles[index].transform.scale);
+
+			Matrix4x4 rotateXMatrix = MyMath::MakeRotateXMatrix(particles[index].transform.rotate.x);
+			Matrix4x4 rotateZMatrix = MyMath::MakeRotateZMatrix(particles[index].transform.rotate.z);
+			Matrix4x4 rotateXYZMatrix = MyMath::Multiply(rotateXMatrix, MyMath::Multiply(billboardMatrix, rotateZMatrix));
+
+			Matrix4x4 translateMatrix = MyMath::MakeTranslateMatrix(particles[index].transform.translate);
+
+			Matrix4x4 worldMatrix = MyMath::Multiply(scaleMatrix, MyMath::Multiply(rotateXYZMatrix, translateMatrix));
+
 			Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 			instancingData[index].WVP = worldViewProjectionMatrix;
 			instancingData[index].World = worldMatrix;
