@@ -28,6 +28,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 
 #include <wrl.h>
 #include <random>
+#include <numbers>
 
 #include "Input.h"
 #include "WinApp.h"
@@ -356,7 +357,7 @@ void SetBlendState(D3D12_BLEND_DESC& blendDesc, BlendMode blendMode) {
 /// <returns></returns>
 Particle MakeNewParticle(std::mt19937& randomEngine) {
 	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
-	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
+	std::uniform_real_distribution<float> distTime(1.0f, 5.0f);
 
 	Particle particle;
 	particle.transform.scale = { 1.0f,1.0f,1.0f };
@@ -871,7 +872,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	//zが-５の位置でｚ+の方向を向いているカメラ
-	Transform cameraTransform{ {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f},{0.0f,0.0f,-10.0f} };
+	Transform cameraTransform{ {1.0f,1.0f,1.0f},{std::numbers::pi_v<float> / 3.0f,std::numbers::pi_v<float>,0.0f},{0.0f,23.0f,10.0f} };
 
 
 	//-------------------------------------
@@ -1019,6 +1020,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 			}
 			
 			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
+			Matrix4x4 backToFrontMatrix = MyMath::MakeRotateYMatrix(std::numbers::pi_v<float>);
 			Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 			instancingData[index].WVP = worldViewProjectionMatrix;
 			instancingData[index].World = worldMatrix;
