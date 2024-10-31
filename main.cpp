@@ -27,6 +27,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include <sstream>
 
 #include <wrl.h>
+#include <random>
 
 #include "Input.h"
 #include "WinApp.h"
@@ -35,6 +36,27 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg
 #include "StringUtility.h"
 #include "D3DResourceLeakChecker.h"
 #include "MyMath.h"
+
+//-------------------------------------
+//BlendMode
+//-------------------------------------
+
+enum BlendMode {
+	//ブレンドなし
+	kBlendModeNone,
+	//通常行αブレンド。デフォルト
+	kBlendModeNormal,
+	//加算
+	kBlendModeAdd,
+	//減算
+	kBlendModeSubtract,
+	//乗算
+	kBlendModeMultily,
+	//スクリーン
+	kBlendModeScreen,
+	//利用してはいけない
+	kCountOfBlendMode,
+};
 
 typedef struct {
 	Vector4 position;
@@ -73,6 +95,23 @@ typedef struct {
 	std::vector<VertexData> vertices;
 	MaterialData material;
 }ModelData;
+
+struct Particle {
+	Transform transform;
+	Vector3 velocity;
+	Vector4 color;
+	// 生存可能な時間
+	float lifeTime;
+	// 発生してからの経過時間
+	float currentTime;
+};
+
+struct ParticleForGPU
+{
+	Matrix4x4 WVP;
+	Matrix4x4 World;
+	Vector4 color;
+};
 
 //-------------------------------------
 //DepthStencilTextureを作る
@@ -246,7 +285,99 @@ ModelData LoadObjFile(const std::string& directoryPath, const std::string& filen
 	return modelData;
 }
 
+void SetBlendState(D3D12_BLEND_DESC& blendDesc, BlendMode blendMode) {
 
+	//すべての色要素を書き込む
+	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	//ブレンドを有効にするか無効にするかの指定
+	blendDesc.RenderTarget[0].BlendEnable = TRUE;
+	switch (blendMode)
+	{
+	case kBlendModeNone:
+		blendDesc.RenderTarget[0].BlendEnable = FALSE;
+		break;
+
+	case kBlendModeNormal:
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+		break;
+
+	case kBlendModeAdd:
+		//加算合成 
+		//Result=SrcColor*SrcAlpha+DestColor
+		//ピクセルシェーダーを出力するRGB値に対して実行する操作を指定する
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		//SrcBlend操作とDestBlend操作を組み合わせる方法を定義する
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+
+	case kBlendModeSubtract:
+		//減算合成
+		//Result=DescColor-SrcColor*SrcAlpha
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_REV_SUBTRACT;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+
+	case kBlendModeMultily:
+		//乗算合成
+		//Result=SrcColor*DestColor
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+		break;
+
+	case kBlendModeScreen:
+		//スクリーン合成
+		//Result=(1-DestColor)*SrcColor+DestColor
+		blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
+		blendDesc.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+		break;
+
+	default:
+		break;
+	}
+
+	//α値ブレンド設定。基本的に使わないのでこのまま
+
+	blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+
+}
+
+/// <summary>
+/// パーティクル一つを生成する
+/// </summary>
+/// <param name="randomEnging"></param>
+/// <returns></returns>
+Particle MakeNewParticle(std::mt19937& randomEngine) {
+	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
+
+	Particle particle;
+	particle.transform.scale = { 1.0f,1.0f,1.0f };
+	particle.transform.rotate = { 0.0f,0.0f,0.0f };
+	// 位置と速度を[-1,1]でランダムに初期化
+	particle.transform.translate = { distribution(randomEngine),distribution(randomEngine), distribution(randomEngine) };
+	particle.velocity = { distribution(randomEngine),distribution(randomEngine), distribution(randomEngine) };
+	particle.color = { distribution(randomEngine),distribution(randomEngine), distribution(randomEngine) ,1.0f };
+	// 1~3秒の間生存するようにする
+	particle.lifeTime = distTime(randomEngine);
+	particle.currentTime = 0;
+
+	return particle;
+}
+
+static Microsoft::WRL::ComPtr<ID3D12PipelineState> CreateGraphicsPipelineState(Microsoft::WRL::ComPtr<ID3D12Device> device, const D3D12_GRAPHICS_PIPELINE_STATE_DESC& desc) {
+	Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
+	HRESULT hr = device->CreateGraphicsPipelineState(&desc, IID_PPV_ARGS(&pipelineState));
+	assert(SUCCEEDED(hr));
+	return pipelineState;
+}
 
 //-------------------------------------
 //main関数
@@ -351,10 +482,10 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	rootParameters[0].ShaderVisibility = D3D12_SHADER_VISIBILITY_PIXEL; //PixelShaderで使う
 	rootParameters[0].Descriptor.ShaderRegister = 0; //レジスタ番号0とバインド
 
-	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; //CBVを使う
+	rootParameters[1].ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE; //DescriptorTableを使う
 	rootParameters[1].ShaderVisibility = D3D12_SHADER_VISIBILITY_VERTEX; //VertexShaderで使う
 	rootParameters[1].DescriptorTable.pDescriptorRanges = descriptorRangeForInstancing;// Tableの中身の配列を指定
-	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);
+	rootParameters[1].DescriptorTable.NumDescriptorRanges = _countof(descriptorRangeForInstancing);// Tableで利用する数
 
 	//-------------------------------------
 	//DescriptorTableを作成
@@ -433,8 +564,9 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	//BlendStateの設定
 	D3D12_BLEND_DESC blendDesc{};
-	//すべての色要素を書き込む
-	blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	BlendMode blendMode = kBlendModeAdd;
+
+	SetBlendState(blendDesc, blendMode);
 
 	//-------------------------------------
 	//RasterizerStateを作成
@@ -469,8 +601,8 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	D3D12_DEPTH_STENCIL_DESC depthStencilDesc{};
 	//Depthの機能を有効化する
 	depthStencilDesc.DepthEnable = true;
-	//書き込みします
-	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	//書き込みを行わない
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	//比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 
@@ -656,16 +788,22 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	// Instancing用Resource
 	//-------------------------------------
 
-	const uint32_t kNumInstance = 10;
+	// インスタンス最大数
+	const uint32_t kNumMaxInstance = 10;
 
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = dxCommon->CreateBufferResource(sizeof(TransformMatrix) * kNumInstance);
+	// Instancing用のTransformationMatrixリソースを作る
+	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource = dxCommon->CreateBufferResource(sizeof(ParticleForGPU) * kNumMaxInstance);
 
-	TransformMatrix* instancingData = nullptr;
+	// 書き込むためのアドレスを取得
+	ParticleForGPU* instancingData = nullptr;
 	instancingResource->Map(0, nullptr, reinterpret_cast<void**>(&instancingData));
 
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
+	// 単位行列を書き込んでおく
+	// 色はとりあえず白
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
 		instancingData[index].WVP = MyMath::MakeIdentity4x4();
 		instancingData[index].World = MyMath::MakeIdentity4x4();
+		instancingData[index].color = Vector4(1.0f, 1.0f, 1.0f, 1.0f);
 	}
 
 	//-------------------------------------
@@ -684,11 +822,20 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		{0.0f,0.0f,0.0f},
 	};
 
-	Transform transforms[kNumInstance];
-	for (uint32_t index = 0; index < kNumInstance; ++index) {
-		transforms[index].scale = { 1.0f,1.0f,1.0f };
-		transforms[index].rotate = { 0.0f,0.0f,0.0f };
-		transforms[index].translate = { index * 0.1f,index * 0.1f,index * 0.1f };
+	//-------------------------------------
+	// Instancing用に最大約数分のTransformを用意
+	//-------------------------------------
+	
+	// Δtを定義。とりあえず60fps固定
+	const float kDeltaTime = 1.0f / 60.0f;
+
+	// 乱数生成器の初期化
+	std::random_device seedGenerator;
+	std::mt19937 randomEngine(seedGenerator());
+
+	Particle particles[kNumMaxInstance];
+	for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+		particles[index] = MakeNewParticle(randomEngine);
 	}
 
 	//-------------------------------------
@@ -731,7 +878,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//Textureを読んで転送する
 	//-------------------------------------
 
-	DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resource/uvChecker.png");
+	DirectX::ScratchImage mipImages = dxCommon->LoadTexture("resource/circle.png");
 	const DirectX::TexMetadata& metadata = mipImages.GetMetadata();
 	Microsoft::WRL::ComPtr<ID3D12Resource> textureResource = dxCommon->CreateTextureResource(metadata);
 	dxCommon->UploadTextureData(textureResource, mipImages);
@@ -786,13 +933,19 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 	//-------------------------------------
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC instancingSrvDesc{};
+	// 構造体のレイアウトは自由に設定できるため不明であるからこの設定
 	instancingSrvDesc.Format = DXGI_FORMAT_UNKNOWN;
 	instancingSrvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	// TextureではなくBufferとしての利用なので
 	instancingSrvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
+	// 当面0にしておく
 	instancingSrvDesc.Buffer.FirstElement = 0;
+	// この設定で固定
 	instancingSrvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	instancingSrvDesc.Buffer.NumElements = kNumInstance;
-	instancingSrvDesc.Buffer.StructureByteStride = sizeof(TransformMatrix);
+	// StructuredBufferとしてアクセスする要素数。今回は10個すべてにアクセスするのでkNumInstanc
+	instancingSrvDesc.Buffer.NumElements = kNumMaxInstance;
+	// StructuredBufferで利用する構造体のサイズ
+	instancingSrvDesc.Buffer.StructureByteStride = sizeof(ParticleForGPU);
 
 	D3D12_CPU_DESCRIPTOR_HANDLE instancingSrvHandleCPU = GetCPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 3);
 	D3D12_GPU_DESCRIPTOR_HANDLE instancingSrvHandleGPU = GetGPUDescriptorHandle(dxCommon->GetSrvDescriptorHeap(), dxCommon->GetDescriptorSizeSRV(), 3);
@@ -826,7 +979,6 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		input->Update();
 
-
 		//-------------------------------------
 		//CBufferの中身を更新する
 		//-------------------------------------
@@ -853,11 +1005,42 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		uvTransformMatrix = MyMath::Multiply(uvTransformMatrix, MyMath::MakeTranslateMatrix(uvTransformSprite.translate));
 		materialDataSprite->uvTransform = uvTransformMatrix;
 
-		for (uint32_t index = 0; index < kNumInstance; ++index) {
-			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transforms[index].scale, transforms[index].rotate, transforms[index].translate);
+		//-------------------------------------
+		// 
+		//-------------------------------------
+
+		// 描画すべきインスタンス数
+		uint32_t numInstance = 0;
+
+		for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+			// 生存時間を過ぎていたら更新せず描画対象にしない
+			if (particles[index].lifeTime <= particles[index].currentTime) {
+				continue;
+			}
+			
+			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
 			Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 			instancingData[index].WVP = worldViewProjectionMatrix;
 			instancingData[index].World = worldMatrix;
+			instancingData[index].color = particles[index].color;
+
+			
+
+			particles[index].transform.translate += particles[index].velocity * kDeltaTime;
+			// 経過時間を足す
+			particles[index].currentTime += kDeltaTime;
+			instancingData[numInstance].WVP = worldViewProjectionMatrix;
+			instancingData[numInstance].World = worldMatrix;
+			instancingData[numInstance].color = particles[index].color;
+			
+			// 徐々に消す
+			float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
+			// α値に適用
+			instancingData[numInstance].color.w = alpha;
+
+			// 生きているParticleの数を1つカウントする
+			++numInstance;
+			
 		}
 
 		//-------------------------------------
@@ -883,6 +1066,23 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::SliderAngle("SphereRotateY", &transform.rotate.y);
 		ImGui::SliderAngle("SphereRotateZ", &transform.rotate.z);
 
+		const char* items[] = { "None","Normal","kBlendModeAdd","kBlendModeSubtract","kBlendModeMultily","kBlendModeScreen" };
+		static int item_current = static_cast<int>(blendMode);
+		if (ImGui::Combo("Blend", &item_current, items, IM_ARRAYSIZE(items))) {
+			blendMode = static_cast<BlendMode>(item_current);
+		}
+
+		//-------------------------------------
+		//ブレンドモードが変更された場合、パイプラインステートを再作成
+		//-------------------------------------
+
+		static BlendMode previousBlendMode = blendMode;
+		if (previousBlendMode != blendMode) {
+			SetBlendState(blendDesc, blendMode);
+			graphicsPipelineStateDesc.BlendState = blendDesc;
+			graphicsPipelineState = CreateGraphicsPipelineState(dxCommon->GetDevice(), graphicsPipelineStateDesc);
+			previousBlendMode = blendMode;
+		}
 	
 		//-------------------------------------
 		// 描画前処理
@@ -913,16 +1113,15 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		//wvp用のCBufferの場所を設定
 		//RootParameter[1]に対してCBVの設定
 		
-
+		// Instancing用のDataを読むためにStructuredBufferのSRVを設定する
 		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(1, instancingSrvHandleGPU);
 
 		//SRVのDescriptorTableの先頭を設定。2はRootParameter[2]である
 		//変数を見て利用するSRVを決める。チェックがはいいているとき（=true）のとき、モンスターボールを使い、falseのときはuvCheckerを使う
 		dxCommon->GetCommandList()->SetGraphicsRootDescriptorTable(2, textureSrvHandleGPU);
 
-		//描画！（DrawCall/ドローコール）。３頂点で１つのインスタンス。
-		//commandList->DrawInstanced(static_cast<size_t>(kSubdivision * kSubdivision) * 6, 1, 0, 0);
-		dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), kNumInstance, 0, 0);
+		//描画！（DrawCall/ドローコール）。kNumInstanc(今回は10)だけInstance描画を行う
+		dxCommon->GetCommandList()->DrawInstanced(UINT(modelData.vertices.size()), numInstance, 0, 0);
 
 		//-------------------------------------
 		// 画面表示できるようにする
