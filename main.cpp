@@ -952,19 +952,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 	dxCommon->GetDevice()->CreateShaderResourceView(instancingResource.Get(), &instancingSrvDesc, instancingSrvHandleCPU);
 
-	//-------------------------------------
-	//ImGuiの初期化
-	//-------------------------------------
-	/*IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGui::StyleColorsDark();
-	ImGui_ImplWin32_Init(winApp->GetHwnd());
-	ImGui_ImplDX12_Init(device.Get(), swapChainDesc.BufferCount, rtvDesc.Format, srvDescriptorHeap.Get(), srvDescriptorHeap->GetCPUDescriptorHandleForHeapStart(), srvDescriptorHeap->GetGPUDescriptorHandleForHeapStart());*/
-
-	//テクスチャ切り替え用のbool変数
-	bool useMonsterBall = true;
-
-
+	bool isUpdate = false;
 
 	while (true) {
 		//Windowのメッセージ処理
@@ -1011,6 +999,48 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 		// 描画すべきインスタンス数
 		uint32_t numInstance = 0;
+	
+		if (isUpdate) {
+
+			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+				// 生存時間を過ぎていたら更新せず描画対象にしない
+				if (particles[index].lifeTime <= particles[index].currentTime) {
+					continue;
+				}
+
+				Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
+				Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
+				instancingData[index].WVP = worldViewProjectionMatrix;
+				instancingData[index].World = worldMatrix;
+				instancingData[index].color = particles[index].color;
+
+
+				particles[index].transform.translate += particles[index].velocity * kDeltaTime;
+				// 経過時間を足す
+				particles[index].currentTime += kDeltaTime;
+				// 徐々に消す
+				float alpha = 1.0f - (particles[index].currentTime / particles[index].lifeTime);
+				// α値に適用
+				instancingData[numInstance].color.w = alpha;
+
+				// 生きているParticleの数を1つカウントする
+				++numInstance;
+			}
+		} else {
+			for (uint32_t index = 0; index < kNumMaxInstance; ++index) {
+				// 生存時間を過ぎていたら更新せず描画対象にしない
+				if (particles[index].lifeTime <= particles[index].currentTime) {
+					continue;
+				}
+
+				Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particles[index].transform.scale, particles[index].transform.rotate, particles[index].transform.translate);
+				Matrix4x4 worldViewProjectionMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
+				instancingData[index].WVP = worldViewProjectionMatrix;
+				instancingData[index].World = worldMatrix;
+				instancingData[index].color = particles[index].color;
+				// 生きているParticleの数を1つカウントする
+				++numInstance;
+			}
 
 		// 裏が見えているので反対側に回す回転行列を作成
 		Matrix4x4 backToFrontMatrix = MyMath::MakeRotateYMatrix(std::numbers::pi_v<float>);
@@ -1058,7 +1088,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 
 			// 生きているParticleの数を1つカウントする
 			++numInstance;
-			
+		
 		}
 
 		//-------------------------------------
@@ -1078,7 +1108,7 @@ int WINAPI WinMain(HINSTANCE, HINSTANCE, LPSTR, int) {
 		ImGui::SliderAngle("CameraRotateY", &cameraTransform.rotate.y);
 		ImGui::SliderAngle("CameraRotateZ", &cameraTransform.rotate.z);
 
-		ImGui::Checkbox("useMonsterBall", &useMonsterBall);
+		ImGui::Checkbox("UpdateParticle", &isUpdate);
 
 		ImGui::SliderAngle("SphereRotateX", &transform.rotate.x);
 		ImGui::SliderAngle("SphereRotateY", &transform.rotate.y);
