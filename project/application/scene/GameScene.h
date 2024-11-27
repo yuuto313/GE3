@@ -1,9 +1,6 @@
 #pragma once
 #include "BaseScene.h"
-#include "SpriteCommon.h"
-#include "Object3dCommon.h"
-#include "TextureManager.h"
-#include "ModelManager.h"
+#include "ParticleManager.h"
 #include "Sprite.h"
 #include "Object3d.h"
 #include "Camera.h"
@@ -42,7 +39,8 @@ public:
 
 private:
 	std::unique_ptr<Camera> camera_;
-	std::vector<std::unique_ptr<Sprite>> sprites_;
-	std::vector<std::unique_ptr<Object3d>> objects3d_;
+	/*std::vector<std::unique_ptr<Sprite>> sprites_;
+	std::vector<std::unique_ptr<Object3d>> objects3d_;*/
+	std::unique_ptr<ParticleManager> particleManager_;
 };
 

@@ -183,9 +183,6 @@
     <ClCompile Include="engine\manager\ParticleManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="Particle.cpp">
-      <Filter>ソース ファイル</Filter>
-    </ClCompile>
     <ClCompile Include="engine\common\ParticleCommon.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
@@ -332,10 +329,10 @@
     <ClInclude Include="engine\manager\ParticleManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Particle.h">
+    <ClInclude Include="engine\common\ParticleCommon.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="engine\common\ParticleCommon.h">
+    <ClInclude Include="ModelData.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>

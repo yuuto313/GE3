@@ -1,5 +1,10 @@
 #include "GameScene.h"
 #include "SceneManager.h"
+#include "TextureManager.h"
+#include "ModelManager.h"
+#include "SpriteCommon.h"
+#include "Object3dCommon.h"
+#include "ParticleCommon.h"
 
 void GameScene::Initialize()
 {
@@ -7,6 +12,11 @@ void GameScene::Initialize()
 	// オーディオファイルの読み込み
 	//-------------------------------------
 
+	//-------------------------------------
+	// パーティクル共通部の初期化
+	//-------------------------------------
+
+	ParticleCommon::GetInstance()->Initialize(DirectXCommon::GetInstance());
 
 	//-------------------------------------
 	// テクスチャファイルの読み込み
@@ -35,64 +45,73 @@ void GameScene::Initialize()
 	// スプライト生成
 	//-------------------------------------
 
-	sprites_.emplace_back(std::make_unique<Sprite>());
-	sprites_.emplace_back(std::make_unique<Sprite>());
-	sprites_.emplace_back(std::make_unique<Sprite>());
+	//sprites_.emplace_back(std::make_unique<Sprite>());
+	//sprites_.emplace_back(std::make_unique<Sprite>());
+	//sprites_.emplace_back(std::make_unique<Sprite>());
 
-	int spriteIndex = 0;
+	//int spriteIndex = 0;
 
-	for (const auto& sprite : sprites_) {
-		// スプライトごとに異なるテクスチャを割り当てる
-		std::string texturePath;
-		if (spriteIndex == 0) {
-			texturePath = "resource/uvChecker.png";
-		} else if (spriteIndex == 1) {
-			texturePath = "resource/eto_tora_family.png";
-		} else {
-			texturePath = "resource/monsterBall.png";
-		}
+	//for (const auto& sprite : sprites_) {
+	//	// スプライトごとに異なるテクスチャを割り当てる
+	//	std::string texturePath;
+	//	if (spriteIndex == 0) {
+	//		texturePath = "resource/uvChecker.png";
+	//	} else if (spriteIndex == 1) {
+	//		texturePath = "resource/eto_tora_family.png";
+	//	} else {
+	//		texturePath = "resource/monsterBall.png";
+	//	}
 
-		sprite->Initialize(SpriteCommon::GetInstance(), texturePath);
+	//	sprite->Initialize(SpriteCommon::GetInstance(), texturePath);
 
-		Vector2 position = sprite->GetPosition();
-		position = Vector2(spriteIndex * 300.0f, spriteIndex + 50.0f);
-		sprite->SetPosition(position);
+	//	Vector2 position = sprite->GetPosition();
+	//	position = Vector2(spriteIndex * 300.0f, spriteIndex + 50.0f);
+	//	sprite->SetPosition(position);
 
-		spriteIndex++;
-	
-	}
+	//	spriteIndex++;
+	//
+	//}
 
 	//-------------------------------------
 	// 3dオブジェクト生成
 	//-------------------------------------
 
-	objects3d_.emplace_back(std::make_unique<Object3d>());
-	objects3d_.emplace_back(std::make_unique<Object3d>());
+	//objects3d_.emplace_back(std::make_unique<Object3d>());
+	//objects3d_.emplace_back(std::make_unique<Object3d>());
 
-	int modelIndex = 0;
+	//int modelIndex = 0;
 
-	for (const auto& object3d : objects3d_) {
+	//for (const auto& object3d : objects3d_) {
 
-		object3d->Initialize(Object3dCommon::GetInstance());
+	//	object3d->Initialize(Object3dCommon::GetInstance());
 
-		Vector3 translate = object3d->GetTranslate();
-		translate = Vector3(modelIndex * 1.0f, modelIndex + 1.0f);
-		object3d->SetTranslate(translate);
+	//	Vector3 translate = object3d->GetTranslate();
+	//	translate = Vector3(modelIndex * 1.0f, modelIndex + 1.0f);
+	//	object3d->SetTranslate(translate);
 
-		// 異なるモデルを割り当てる
-		std::string filePath;
-		if (modelIndex == 0) {
-			filePath = "axis.obj";
-		} else if (modelIndex == 1) {
-			filePath = "plane.obj";
-		}
+	//	// 異なるモデルを割り当てる
+	//	std::string filePath;
+	//	if (modelIndex == 0) {
+	//		filePath = "axis.obj";
+	//	} else if (modelIndex == 1) {
+	//		filePath = "plane.obj";
+	//	}
 
-		object3d->SetModel(filePath);
+	//	object3d->SetModel(filePath);
 
-		object3d->SetCamera(camera_.get());
+	//	object3d->SetCamera(camera_.get());
 
-		modelIndex++;
-	}
+	//	modelIndex++;
+	//}
+
+	//-------------------------------------
+	// パーティクルマネージャ生成
+	//-------------------------------------
+
+	particleManager_ = std::make_unique<ParticleManager>();
+	particleManager_->Initialize(DirectXCommon::GetInstance(),SrvManager::GetInstance());
+	particleManager_->SetCamera(camera_.get());
+	particleManager_->CreateParticleGroup("Particle", "resource/uvChecker.png");
 
 	//-------------------------------------
 	// BGM再生開始
@@ -107,9 +126,15 @@ void GameScene::Finalize()
 	// 解放処理
 	//-------------------------------------
 
-	sprites_.clear();
+	/*sprites_.clear();
 
-	objects3d_.clear();
+	objects3d_.clear();*/
+
+	//-------------------------------------
+	// パーティクル共通部の終了処理
+	//-------------------------------------
+
+	ParticleCommon::GetInstance()->Finalize();
 
 }
 
@@ -129,18 +154,18 @@ void GameScene::Update()
 	// スプライトの更新
 	//-------------------------------------
 
-	for (const auto& sprite : sprites_) {
-		sprite->Update();
+	//for (const auto& sprite : sprites_) {
+	//	sprite->Update();
 
-		sprite->SetSize({ 600.0f,300.0f });
+	//	sprite->SetSize({ 600.0f,300.0f });
 
-		float rotation = sprite->GetRotation();
-		rotation += 0.01f;
-		sprite->SetRotation(rotation);
+	//	float rotation = sprite->GetRotation();
+	//	rotation += 0.01f;
+	//	sprite->SetRotation(rotation);
 
-		// ImGuiを表示
-		sprite->ImGui();
-	}
+	//	// ImGuiを表示
+	//	sprite->ImGui();
+	//}
 
 	//-------------------------------------
 	// カメラの更新
@@ -153,9 +178,15 @@ void GameScene::Update()
 	// 3dオブジェクトの更新
 	//-------------------------------------
 
-	for (const auto& object3d : objects3d_) {
+	/*for (const auto& object3d : objects3d_) {
 		object3d->Update();
-	}
+	}*/
+
+	//-------------------------------------
+	// パーティクルマネージャの更新
+	//-------------------------------------
+
+	particleManager_->Update();
 
 }
 
@@ -169,15 +200,30 @@ void GameScene::Draw()
 	// Sprite個々の描画
 	//-------------------------------------
 
-	for (const auto& sprite : sprites_) {
+	/*for (const auto& sprite : sprites_) {
 		sprite->Draw();
-	}
+	}*/
 
 	//-------------------------------------
 	// 3dオブジェクト個々の描画
 	//-------------------------------------
 
-	for (const auto& object3d : objects3d_) {
+	/*for (const auto& object3d : objects3d_) {
 		object3d->Draw();
-	}
+	}*/
+
+	//-------------------------------------
+	// パーティクル共通部の描画準備
+	//-------------------------------------
+
+	ParticleCommon::GetInstance()->PreDraw();
+
+	//-------------------------------------
+	// パーティクル個々の更新
+	//-------------------------------------
+
+	particleManager_->Draw();
+
 }
+
+

@@ -8,7 +8,7 @@
 #include <format>
 
 /// <summary>
-/// テクスチャマネージャー
+/// モデルマネージャー
 /// </summary>
 class ModelManager
 {

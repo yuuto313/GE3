@@ -3,14 +3,7 @@
 #include "VertexData.h"
 #include "Material.h"
 #include "SrvManager.h"
-
-#include <vector>
-
-//ModelData構造体
-struct ModelData {
-	std::vector<VertexData> vertices;
-	MaterialData material;
-};
+#include "ModelData.h"
 
 /// <summary>
 /// 3Dモデル
@@ -29,6 +22,8 @@ public:// 基本処理
 	/// 描画処理
 	/// </summary>
 	void Draw();
+
+	ModelData GetModelData() { return modelData_; }
 
 private:// メンバ変数
 

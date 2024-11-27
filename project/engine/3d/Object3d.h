@@ -20,7 +20,7 @@ struct DirectionalLight{
 class Object3dCommon;
 
 /// <summary>
-/// 3Dオブジェクト
+/// 3Dオブジェクト（配置）
 /// </summary>
 class Object3d
 {

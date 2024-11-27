@@ -8,13 +8,13 @@ void TitleScene::Initialize()
 	// オーディオファイルの読み込み
 	//-------------------------------------
 
-	soundData_ = Audio::GetInstance()->SoundLoadWave("Resources/sound/Alarm01.wav");
+
 
 	//-------------------------------------
 	// BGM再生開始
 	//-------------------------------------
 
-	Audio::GetInstance()->SoundPlayWave(soundData_);
+	
 
 	//-------------------------------------
 	// テクスチャファイルの読み込み
@@ -40,9 +40,6 @@ void TitleScene::Finalize()
 	if(sprite_) {
 		sprite_.reset();
 	}
-
-	Audio::GetInstance()->SoundUnload(&soundData_);
-
 }
 
 void TitleScene::Update()

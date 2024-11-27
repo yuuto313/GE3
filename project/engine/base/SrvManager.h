@@ -81,6 +81,15 @@ public:
 	void CreateSRVforTexture2D(uint32_t srvIndex, ID3D12Resource* pResource, DXGI_FORMAT format, UINT mipLevels);
 
 	/// <summary>
+	/// SRV生成（パーティクル用）
+	/// </summary>
+	/// <param name="srvIndex"></param>
+	/// <param name="pResource"></param>
+	/// <param name="format"></param>
+	/// <param name="mipLevels"></param>
+	void CreateSRVforParticle(uint32_t srvIndex, ID3D12Resource* pResource, UINT structureByteStride);
+
+	/// <summary>
 	/// SRV生成（Structured Buffer用）
 	/// </summary>
 	/// <param name="srvIndex"></param>
