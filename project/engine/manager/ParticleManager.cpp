@@ -70,12 +70,19 @@ void ParticleManager::Draw()
 	for (const auto& particle : particleGroup_) {
 
 		//-------------------------------------
+		// マテリアルCBufferの場所を設定
+		//-------------------------------------
+	
+		//マテリアルCBufferの場所を設定
+		pDxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+
+		//-------------------------------------
 		// SRVのDescriptorTableの先頭を設定
 		//-------------------------------------
 
-		SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(1,)
+		pSrvManager_->SetGraphicsRootDescriptorTable(1, 3);
 
-		SrvManager::GetInstance()->SetGraphicsRootDescriptorTable(2, particle.second.srvIndex);
+		pSrvManager_->SetGraphicsRootDescriptorTable(2, particle.second.srvIndex);
 
 		pDxCommon_->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), particle.second.kNumInstance, 0, 0);
 	}
@@ -97,7 +104,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	// インスタンシング用リソースの生成
 	CreateInstancingResource();
 	// インスタンシング用にSRVを確保してSRVインデックスを記録
-	particleGroup.srvIndex = SrvManager::GetInstance()->Allocate();
+	particleGroup.srvIndex = pSrvManager_->Allocate();
 
 	// SRV生成
 	pSrvManager_->CreateSRVforParticle(particleGroup.srvIndex,particleGroup.instancingResource_.Get(), sizeof(TransformationMatrix));
@@ -132,6 +139,33 @@ void ParticleManager::CreateVertexData()
 	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
 	//頂点データをリソースにコピー
 	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
+}
+
+void ParticleManager::CreateMaterialData()
+{
+	//-------------------------------------
+	// マテリアルリソースを作る
+	//-------------------------------------
+
+	materialResource_ = pDxCommon_->CreateBufferResource(sizeof(Material));
+
+	//-------------------------------------
+	// マテリアルリソースにデータを書き込むためのアドレスを取得してmaterialDataに割り当てる
+	//-------------------------------------
+
+	// 書き込むためのアドレスを取得
+	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
+
+	//-------------------------------------
+	// マテリアルデータの初期値を書き込む
+	//-------------------------------------
+
+	// 今回は白を書き込み
+	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
+	// SpriteはLightingしないのでfalseを設定する
+	materialData_->enableLighting = false;
+	// 単位行列で初期化
+	materialData_->uvTransform = MyMath::MakeIdentity4x4();
 }
 
 void ParticleManager::CreateInstancingResource()

@@ -68,10 +68,12 @@ private:
 
 	// バッファリソース
 	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
+	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
 
 	// バッファリソース内のデータを指すポインタ
 	VertexData* vertexData_ = nullptr;
+	Material* materialData_ = nullptr;
 	TransformationMatrix* instancingData_ = nullptr;
 
 	// バッファリソースの使い道を補足するバッファビュー
@@ -83,6 +85,11 @@ private:
 	/// 頂点データ作成
 	/// </summary>
 	void CreateVertexData();
+
+	/// <summary>
+	/// マテリアルデータ作成
+	/// </summary>
+	void CreateMaterialData();
 
 	/// <summary>
 	/// インスタンシングResourceの作成
