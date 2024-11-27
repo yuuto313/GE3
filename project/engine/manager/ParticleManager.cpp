@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "ModelManager.h"
 #include "Camera.h"
+#include "Model.h"
 #include <random>
 #include <numbers>
 
@@ -16,8 +17,9 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 
 	// パイプライン生成はParticleCommon内で実装
 
-	// 頂点データの初期化
-	CreateVertexData();
+	// モデルの情報を得る
+	pModel = ModelManager::GetInstance()->FindModel("plane.obj");
+
 }
 
 void ParticleManager::Update()
@@ -37,11 +39,12 @@ void ParticleManager::Update()
 	Matrix4x4 projectionMatrix = pCamera_->GetProjectionMatrix();
 
 	// 全てのパーティクルグループについて処理する
-	for (const auto& particle : particleGroup_) {
-		ParticleGroup group = particle.second;
+	for (const auto& particleGroup : particleGroup_) {
+		ParticleGroup group = particleGroup.second;
 		// グループ内の全てのパーティクルについて処理する
 		for (auto it = group.particles.begin(); it != group.particles.end();++it) {
 			Particle& particle = *it;
+			particle.transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f,},{0.0f,0.0f,0.0f} };
 			// 寿命に達していたらグループから外す
 
 			// 場の影響を計算
@@ -65,7 +68,7 @@ void ParticleManager::Update()
 void ParticleManager::Draw()
 {
 	// VBVを設定
-	pDxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, &vertexBufferView_);
+	pDxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, pModel->GetVertexBufferView());
 	// 全てのパーティクルグループについて処理する
 	for (const auto& particle : particleGroup_) {
 
@@ -74,27 +77,30 @@ void ParticleManager::Draw()
 		//-------------------------------------
 	
 		//マテリアルCBufferの場所を設定
-		pDxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, materialResource_->GetGPUVirtualAddress());
+		pDxCommon_->GetCommandList()->SetGraphicsRootConstantBufferView(0, pModel->GetMaterialResource()->GetGPUVirtualAddress());
 
 		//-------------------------------------
 		// SRVのDescriptorTableの先頭を設定
 		//-------------------------------------
 
-		pSrvManager_->SetGraphicsRootDescriptorTable(1, 3);
+		pSrvManager_->SetGraphicsRootDescriptorTable(1, particle.second.srvIndex);
+		pSrvManager_->SetGraphicsRootDescriptorTable(2, particle.second.materialData.textureIndex);
 
-		pSrvManager_->SetGraphicsRootDescriptorTable(2, particle.second.srvIndex);
-
-		pDxCommon_->GetCommandList()->DrawInstanced(UINT(modelData_.vertices.size()), particle.second.kNumInstance, 0, 0);
+		pDxCommon_->GetCommandList()->DrawInstanced(UINT(pModel->GetModelData().vertices.size()), particle.second.kNumInstance, 0, 0);
 	}
 }
 
 void ParticleManager::CreateParticleGroup(const std::string name, const std::string textureFilePath)
 {
 	// 登録済みの名前かチェックしてassert
-	assert(particleGroup_.contains(name));
+	assert(!particleGroup_.contains(name));
 
 	//新たな空のパーティクルグループを作成し、コンテナに登録
-	ParticleGroup particleGroup;
+	ParticleGroup particleGroup = {};
+	// パーティクルの個数を確保
+	for (uint32_t i = 0; i < particleGroup.kNumInstance; i++) {
+		particleGroup.particles.emplace_back();
+	}
 	// テクスチャファイルパスを設定
 	particleGroup.materialData.textureFilePath = textureFilePath;
 	// テクスチャを読み込む
@@ -102,7 +108,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	// テクスチャのSRVインデックスを記録
 	particleGroup.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(particleGroup.materialData.textureFilePath);
 	// インスタンシング用リソースの生成
-	CreateInstancingResource();
+	CreateInstancingResource(particleGroup);
 	// インスタンシング用にSRVを確保してSRVインデックスを記録
 	particleGroup.srvIndex = pSrvManager_->Allocate();
 
@@ -113,68 +119,13 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 }
 
-void ParticleManager::CreateVertexData()
-{
-	//-------------------------------------
-	// VertexResourceを作る
-	//-------------------------------------
-
-	vertexResource_ = pDxCommon_->CreateBufferResource(sizeof(VertexData) * modelData_.vertices.size());
-
-	//-------------------------------------
-	// VertexBufferViewを作成する(値を設定するだけ)
-	//-------------------------------------
-
-	//リソースの先頭アドレスから使う
-	vertexBufferView_.BufferLocation = vertexResource_->GetGPUVirtualAddress();
-	//使用するリソースのサイズは頂点のサイズ
-	vertexBufferView_.SizeInBytes = UINT(sizeof(VertexData) * modelData_.vertices.size());
-	//１頂点当たりのサイズ
-	vertexBufferView_.StrideInBytes = sizeof(VertexData);
-
-	//-------------------------------------
-	// VertexResourceにデータを書き込むためのアドレスを取得してVertexDataに割り当てる
-	//-------------------------------------
-
-	vertexResource_->Map(0, nullptr, reinterpret_cast<void**>(&vertexData_));
-	//頂点データをリソースにコピー
-	std::memcpy(vertexData_, modelData_.vertices.data(), sizeof(VertexData) * modelData_.vertices.size());
-}
-
-void ParticleManager::CreateMaterialData()
-{
-	//-------------------------------------
-	// マテリアルリソースを作る
-	//-------------------------------------
-
-	materialResource_ = pDxCommon_->CreateBufferResource(sizeof(Material));
-
-	//-------------------------------------
-	// マテリアルリソースにデータを書き込むためのアドレスを取得してmaterialDataに割り当てる
-	//-------------------------------------
-
-	// 書き込むためのアドレスを取得
-	materialResource_->Map(0, nullptr, reinterpret_cast<void**>(&materialData_));
-
-	//-------------------------------------
-	// マテリアルデータの初期値を書き込む
-	//-------------------------------------
-
-	// 今回は白を書き込み
-	materialData_->color = { 1.0f, 1.0f, 1.0f, 1.0f };
-	// SpriteはLightingしないのでfalseを設定する
-	materialData_->enableLighting = false;
-	// 単位行列で初期化
-	materialData_->uvTransform = MyMath::MakeIdentity4x4();
-}
-
-void ParticleManager::CreateInstancingResource()
+void ParticleManager::CreateInstancingResource(ParticleGroup particleGroup)
 {
 	// Instancing用のTransformationMatrixリソースを作る
-	instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
+	particleGroup.instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
 
-	instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&instancingData_));
+	particleGroup.instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleGroup.instancingData_));
 
-	instancingData_->WVP = MyMath::MakeIdentity4x4();
-	instancingData_->World = MyMath::MakeIdentity4x4();
+	particleGroup.instancingData_->WVP = MyMath::MakeIdentity4x4();
+	particleGroup.instancingData_->World = MyMath::MakeIdentity4x4();
 }

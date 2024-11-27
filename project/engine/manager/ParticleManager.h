@@ -3,11 +3,10 @@
 #include "SrvManager.h"
 #include "TransformationMatrix.h"
 #include "MyMath.h"
-#include "Model.h"
 #include "Object3d.h"
-#include "ModelData.h"
 
 class Camera;
+class Model;
 
 // Particle構造体
 struct Particle {
@@ -58,43 +57,19 @@ private:
 
 	DirectXCommon* pDxCommon_ = nullptr;
 	SrvManager* pSrvManager_ = nullptr;
+	Model* pModel = nullptr;
 	Camera* pCamera_ = nullptr;
-	std::unique_ptr<Object3d> pObjects_;
+
+	Transform transforms;
 
 	std::unordered_map<std::string, ParticleGroup> particleGroup_;
-
-	// objファイルのデータ
-	ModelData modelData_;
-
-	// バッファリソース
-	Microsoft::WRL::ComPtr<ID3D12Resource> vertexResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> materialResource_;
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;
-
-	// バッファリソース内のデータを指すポインタ
-	VertexData* vertexData_ = nullptr;
-	Material* materialData_ = nullptr;
-	TransformationMatrix* instancingData_ = nullptr;
-
-	// バッファリソースの使い道を補足するバッファビュー
-	D3D12_VERTEX_BUFFER_VIEW vertexBufferView_;
 
 private:
 
 	/// <summary>
-	/// 頂点データ作成
-	/// </summary>
-	void CreateVertexData();
-
-	/// <summary>
-	/// マテリアルデータ作成
-	/// </summary>
-	void CreateMaterialData();
-
-	/// <summary>
 	/// インスタンシングResourceの作成
 	/// </summary>
-	void CreateInstancingResource();
+	void CreateInstancingResource(ParticleGroup particleGroup);
 
 };
 

@@ -6,7 +6,7 @@
 #include "ModelData.h"
 
 /// <summary>
-/// 3Dモデル
+/// 3Dモデル（見た目）
 /// </summary>
 class Model
 {
@@ -24,6 +24,8 @@ public:// 基本処理
 	void Draw();
 
 	ModelData GetModelData() { return modelData_; }
+	D3D12_VERTEX_BUFFER_VIEW* GetVertexBufferView() { return &vertexBufferView_; }
+	ID3D12Resource* GetMaterialResource()const { return materialResource_.Get(); }
 
 private:// メンバ変数
 
