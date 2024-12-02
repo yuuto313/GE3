@@ -41,6 +41,5 @@ private:
 	std::unique_ptr<Camera> camera_;
 	/*std::vector<std::unique_ptr<Sprite>> sprites_;
 	std::vector<std::unique_ptr<Object3d>> objects3d_;*/
-	std::unique_ptr<ParticleManager> particleManager_;
 };
 

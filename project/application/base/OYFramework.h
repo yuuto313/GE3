@@ -8,6 +8,7 @@
 #include "ModelManager.h"
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
+#include "ParticleCommon.h"
 
 #include "SceneManager.h"
 #include "SceneFactory.h"

@@ -1,10 +1,21 @@
 #include "ParticleManager.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
+#include "ParticleCommon.h"
 #include "Camera.h"
 #include "Model.h"
 #include <random>
 #include <numbers>
+
+ParticleManager* ParticleManager::instance = nullptr;
+
+ParticleManager* ParticleManager::GetInstance()
+{
+	if (instance == nullptr) {
+		instance = new ParticleManager();
+	}
+	return instance;
+}
 
 void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager)
 {
@@ -15,11 +26,29 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	std::random_device seedGenerator;
 	std::mt19937 randomEngine(seedGenerator());
 
+	//-------------------------------------
+	// パーティクル共通部の初期化
+	//-------------------------------------
+
 	// パイプライン生成はParticleCommon内で実装
+	ParticleCommon::GetInstance()->Initialize(pDxCommon_);
 
 	// モデルの情報を得る
 	pModel = ModelManager::GetInstance()->FindModel("plane.obj");
 
+}
+
+void ParticleManager::Finalize()
+{
+
+	//-------------------------------------
+	// パーティクル共通部の終了処理
+	//-------------------------------------
+
+	ParticleCommon::GetInstance()->Finalize();
+
+	delete instance;
+	instance = nullptr;
 }
 
 void ParticleManager::Update()
@@ -67,6 +96,12 @@ void ParticleManager::Update()
 
 void ParticleManager::Draw()
 {
+	//-------------------------------------
+	// パーティクル共通部の描画準備
+	//-------------------------------------
+
+	ParticleCommon::GetInstance()->PreDraw();
+
 	// VBVを設定
 	pDxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, pModel->GetVertexBufferView());
 	// 全てのパーティクルグループについて処理する
@@ -99,7 +134,11 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	ParticleGroup particleGroup = {};
 	// パーティクルの個数を確保
 	for (uint32_t i = 0; i < particleGroup.kNumInstance; i++) {
-		particleGroup.particles.emplace_back();
+		Particle particle = {};
+		particle.transform.scale = { 1.0f,1.0f,1.0f };
+		particle.transform.rotate = { 0.0f,0.0f,0.0f };
+		particle.transform.translate = { i * 0.1f,i * 0.1f,i * 0.1f };
+		particleGroup.particles.push_back(particle);
 	}
 	// テクスチャファイルパスを設定
 	particleGroup.materialData.textureFilePath = textureFilePath;
@@ -117,6 +156,12 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 	particleGroup_.emplace(name,particleGroup);
 
+}
+
+void ParticleManager::Emit(const std::string name, const Vector3& position, uint32_t count)
+{
+	// 登録済みのパーティクルグループ名かチェック
+	assert(!particleGroup_.contains(name));
 }
 
 void ParticleManager::CreateInstancingResource(ParticleGroup particleGroup)
