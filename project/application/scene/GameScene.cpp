@@ -35,18 +35,23 @@ void GameScene::Initialize()
 	// パーティクルマネージャ生成
 	//-------------------------------------
 
-	ParticleManager::GetInstance()->Initialize(DirectXCommon::GetInstance(), SrvManager:: GetInstance());
 	ParticleManager::GetInstance()->SetCamera(camera_.get());
-	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "resource/uvChecker.png");
+	ParticleManager::GetInstance()->SetModel("plane.obj");
+	// パーティクルグループ生成
+	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "resource/eto_tora_family.png");
+
+	//-------------------------------------
+	// パーティクルエミッタ生成
+	//-------------------------------------
+
+	particleEmitter_ = std::make_unique<ParticleEmitter>();
+	particleEmitter_->Initialize();
+
 
 }
 
 void GameScene::Finalize()
 {
-	//-------------------------------------
-	// 解放処理
-	//-------------------------------------	
-
 }
 
 void GameScene::Update()
@@ -68,11 +73,12 @@ void GameScene::Update()
 	// 3dオブジェクトの更新より前に行う
 	camera_->Update();
 
+
 	//-------------------------------------
-	// パーティクルマネージャの更新
+	// パーティクルエミッターの更新
 	//-------------------------------------
 
-	ParticleManager::GetInstance()->Update();
+	particleEmitter_->Update("Particle", { -0.1f,0.1f,0.1f }, 10);
 
 }
 
@@ -82,13 +88,7 @@ void GameScene::ImGui()
 
 void GameScene::Draw()
 {
-
-	//-------------------------------------
-	// パーティクル個々の更新
-	//-------------------------------------
-
-	ParticleManager::GetInstance()->Draw();
-
+	particleEmitter_->Draw();
 }
 
 

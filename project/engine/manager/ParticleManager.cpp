@@ -4,7 +4,6 @@
 #include "ParticleCommon.h"
 #include "Camera.h"
 #include "Model.h"
-#include <random>
 #include <numbers>
 
 ParticleManager* ParticleManager::instance = nullptr;
@@ -23,8 +22,7 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	this->pSrvManager_ = srvManager;
 
 	// ランダムエンジンの初期化
-	std::random_device seedGenerator;
-	std::mt19937 randomEngine(seedGenerator());
+	randomEngine_ = std::mt19937(seedGenerator_());
 
 	//-------------------------------------
 	// パーティクル共通部の初期化
@@ -32,9 +30,6 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 
 	// パイプライン生成はParticleCommon内で実装
 	ParticleCommon::GetInstance()->Initialize(pDxCommon_);
-
-	// モデルの情報を得る
-	pModel = ModelManager::GetInstance()->FindModel("plane.obj");
 
 }
 
@@ -68,12 +63,13 @@ void ParticleManager::Update()
 	Matrix4x4 projectionMatrix = pCamera_->GetProjectionMatrix();
 
 	// 全てのパーティクルグループについて処理する
-	for (const auto& particleGroup : particleGroup_) {
-		ParticleGroup group = particleGroup.second;
+	for (std::unordered_map<std::string, ParticleGroup>::iterator particleGroupIterator = particleGroup_.begin();
+		particleGroupIterator != particleGroup_.end();
+		++particleGroupIterator){
 		// グループ内の全てのパーティクルについて処理する
-		for (auto it = group.particles.begin(); it != group.particles.end();++it) {
-			Particle& particle = *it;
-			particle.transform = { {1.0f,1.0f,1.0f},{0.0f,0.0f,0.0f,},{0.0f,0.0f,0.0f} };
+		for (std::list<Particle>::iterator particleIterator = particleGroupIterator->second.particles.begin();
+			particleIterator != particleGroupIterator->second.particles.end();) {
+			
 			// 寿命に達していたらグループから外す
 
 			// 場の影響を計算
@@ -83,12 +79,14 @@ void ParticleManager::Update()
 			// 経過時間を加算
 
 			// ワールド行列を計算
-			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particle.transform.scale, particle.transform.rotate, particle.transform.translate);
+			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particleIterator->transform.scale, particleIterator->transform.rotate, particleIterator->transform.translate);
 			// ワールドビュープロジェクション行列を合成
 			Matrix4x4 worldViewProjection = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 			// インスタンシング用データ1個分の書き込み
-			group.instancingData_->WVP = worldViewProjection;
-			group.instancingData_->World = worldMatrix;
+			particleGroupIterator->second.instancingData_->WVP = worldViewProjection;
+			particleGroupIterator->second.instancingData_->World = worldMatrix;
+
+			++particleIterator;
 		}
 	}
 
@@ -105,7 +103,9 @@ void ParticleManager::Draw()
 	// VBVを設定
 	pDxCommon_->GetCommandList()->IASetVertexBuffers(0, 1, pModel->GetVertexBufferView());
 	// 全てのパーティクルグループについて処理する
-	for (const auto& particle : particleGroup_) {
+	for (std::unordered_map<std::string, ParticleGroup>::iterator particleGroupIterator = particleGroup_.begin();
+		particleGroupIterator != particleGroup_.end();
+		++particleGroupIterator) {
 
 		//-------------------------------------
 		// マテリアルCBufferの場所を設定
@@ -118,10 +118,10 @@ void ParticleManager::Draw()
 		// SRVのDescriptorTableの先頭を設定
 		//-------------------------------------
 
-		pSrvManager_->SetGraphicsRootDescriptorTable(1, particle.second.srvIndex);
-		pSrvManager_->SetGraphicsRootDescriptorTable(2, particle.second.materialData.textureIndex);
+		pSrvManager_->SetGraphicsRootDescriptorTable(1, particleGroupIterator->second.srvIndex);
+		pSrvManager_->SetGraphicsRootDescriptorTable(2, particleGroupIterator->second.materialData.textureIndex);
 
-		pDxCommon_->GetCommandList()->DrawInstanced(UINT(pModel->GetModelData().vertices.size()), particle.second.kNumInstance, 0, 0);
+		pDxCommon_->GetCommandList()->DrawInstanced(UINT(pModel->GetModelData().vertices.size()), particleGroupIterator->second.kNumInstance, 0, 0);
 	}
 }
 
@@ -131,46 +131,66 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	assert(!particleGroup_.contains(name));
 
 	//新たな空のパーティクルグループを作成し、コンテナに登録
-	ParticleGroup particleGroup = {};
-	// パーティクルの個数を確保
-	for (uint32_t i = 0; i < particleGroup.kNumInstance; i++) {
-		Particle particle = {};
-		particle.transform.scale = { 1.0f,1.0f,1.0f };
-		particle.transform.rotate = { 0.0f,0.0f,0.0f };
-		particle.transform.translate = { i * 0.1f,i * 0.1f,i * 0.1f };
-		particleGroup.particles.push_back(particle);
-	}
+	ParticleGroup& particleGroup = particleGroup_[name];
 	// テクスチャファイルパスを設定
 	particleGroup.materialData.textureFilePath = textureFilePath;
-	// テクスチャを読み込む
-	TextureManager::GetInstance()->LoadTexture(particleGroup.materialData.textureFilePath);
+
 	// テクスチャのSRVインデックスを記録
 	particleGroup.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(particleGroup.materialData.textureFilePath);
-	// インスタンシング用リソースの生成
-	CreateInstancingResource(particleGroup);
+
+	// インスタンシング用リソースの作成
+	// Instancing用のTransformationMatrixリソースを作る
+	particleGroup.instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(TransformationMatrix) * particleGroup.kNumInstance);
+
+	particleGroup.instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleGroup.instancingData_));
+
+	// 単位行列を書き込んでおく
+	for (uint32_t index = 0; index < particleGroup.kNumInstance; ++index) {
+		particleGroup.instancingData_[index].WVP = MyMath::MakeIdentity4x4();
+		particleGroup.instancingData_[index].World = MyMath::MakeIdentity4x4();
+	}
+
 	// インスタンシング用にSRVを確保してSRVインデックスを記録
 	particleGroup.srvIndex = pSrvManager_->Allocate();
 
 	// SRV生成
 	pSrvManager_->CreateSRVforParticle(particleGroup.srvIndex,particleGroup.instancingResource_.Get(), sizeof(TransformationMatrix));
 
-	particleGroup_.emplace(name,particleGroup);
-
 }
 
-void ParticleManager::Emit(const std::string name, const Vector3& position, uint32_t count)
+void ParticleManager::SetModel(const std::string filePath)
+{
+	// モデルの情報を得る
+	pModel = ModelManager::GetInstance()->FindModel(filePath);
+}
+
+Particle ParticleManager::MakeNewParticle(Vector3& translate)
+{
+	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	const float deltaTime = 1.0f / 60.0f;
+
+	Particle particle;
+	particle.transform.scale = { 1.0f,1.0f,1.0f };
+	particle.transform.rotate = { 0.0f,0.0f,0.0f };
+	particle.transform.translate = { translate };
+	// 発生場所
+	/*Vector3 randomTranslate{ distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
+	particle.transform.translate = randomTranslate + translate;
+	particle.velocity = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
+
+	particle.transform.translate += particle.velocity * deltaTime;*/
+
+	return particle;
+}
+
+void ParticleManager::Emit(const std::string name, const Vector3& translate, uint32_t count)
 {
 	// 登録済みのパーティクルグループ名かチェック
-	assert(!particleGroup_.contains(name));
-}
+	assert(particleGroup_.contains(name));
 
-void ParticleManager::CreateInstancingResource(ParticleGroup particleGroup)
-{
-	// Instancing用のTransformationMatrixリソースを作る
-	particleGroup.instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(TransformationMatrix));
-
-	particleGroup.instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleGroup.instancingData_));
-
-	particleGroup.instancingData_->WVP = MyMath::MakeIdentity4x4();
-	particleGroup.instancingData_->World = MyMath::MakeIdentity4x4();
+	// 新たなパーティクルを作成し、指定されたパーティクルグループに登録
+	for (uint32_t index = 0; index < count; ++index) {
+		Vector3 newTranslate = { index * translate.x,index * translate.y,index * translate.z };
+		particleGroup_[name].particles.push_back(MakeNewParticle(newTranslate));
+	}
 }
