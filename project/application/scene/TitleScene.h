@@ -4,7 +4,6 @@
 #include "Sprite.h"
 #include "TextureManager.h"
 #include "Input.h"
-#include "Audio.h"
 
 /// <summary>
 /// タイトルシーン
@@ -40,8 +39,5 @@ public:
 private:
 	std::unique_ptr<Sprite> sprite_;
 	Vector2 position_;
-
-	SoundData soundData_;
-
 };
 

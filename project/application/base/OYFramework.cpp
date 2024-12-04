@@ -53,6 +53,12 @@ void OYFramework::Initialize()
 	ModelManager::GetInstance()->Initialize(pDxCommon_);
 	
 	//-------------------------------------
+	// パーティクルマネージャの初期化
+	//-------------------------------------
+
+	ParticleManager::GetInstance()->Initialize(DirectXCommon::GetInstance(), SrvManager::GetInstance());
+
+	//-------------------------------------
 	// ImGui（デバッグテキスト）の初期化
 	//-------------------------------------
 
@@ -69,7 +75,7 @@ void OYFramework::Initialize()
 void OYFramework::Finalize()
 {
 	//-------------------------------------
-	// シーンマネージャの解放
+	// シーンマネージャの終了処理
 	//-------------------------------------
 
 	SceneManager::GetInstance()->Finalize();
@@ -79,6 +85,12 @@ void OYFramework::Finalize()
 	//-------------------------------------
 
 	ImGuiManager::GetInstance()->Finalize();
+
+	//-------------------------------------
+	// パーティクルマネージャの終了処理
+	//-------------------------------------	
+
+	ParticleManager::GetInstance()->Finalize();
 
 	//-------------------------------------
 	// 3dモデルマネージャの終了処理
@@ -153,6 +165,7 @@ void OYFramework::Update()
 	//-------------------------------------
 
 	SceneManager::GetInstance()->Update();
+
 
 }
 

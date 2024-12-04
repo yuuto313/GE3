@@ -10,6 +10,7 @@
 #include "MyMatrix3x3.h"
 #include "MyMatrix4x4.h"
 #include "MyTransform.h"
+#include "AABB.h"
 
 //-------------------------------------
 // 数学関数
@@ -136,6 +137,14 @@ namespace MyMath{
 	/// <param name="farClip"></param>
 	/// <returns></returns>
 	Matrix4x4 MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip);
+
+	/// <summary>
+	/// AABBとVector3の当たり判定
+	/// </summary>
+	/// <param name="aabb"></param>
+	/// <param name="point"></param>
+	/// <returns></returns>
+	bool IsCollision(const AABB& aabb, const Vector3& point);
 
 }
 

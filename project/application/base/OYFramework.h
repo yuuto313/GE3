@@ -6,8 +6,10 @@
 #include "ImGuiManager.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
+#include "ParticleManager.h"
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
+#include "ParticleCommon.h"
 
 #include "SceneManager.h"
 #include "SceneFactory.h"
