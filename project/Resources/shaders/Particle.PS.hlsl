@@ -21,7 +21,7 @@ PixcelShaderOutput main(VertexShaderOutput input)
     PixcelShaderOutput output;
     float4 transformedUV = mul(float4(input.texcoord, 0.0f, 1.0f), gMaterial.uvTransform);
     float4 textureColor = gTexture.Sample(gSampler, transformedUV.xy);
-    output.color = gMaterial.color * textureColor;
+    output.color = gMaterial.color * textureColor * input.color;
    
     // output.colorのα値が0のときにPixelを棄却
     if (output.color.a == 0.0)

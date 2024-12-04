@@ -66,10 +66,14 @@ void ParticleManager::Update()
 	for (std::unordered_map<std::string, ParticleGroup>::iterator particleGroupIterator = particleGroup_.begin();
 		particleGroupIterator != particleGroup_.end();
 		++particleGroupIterator){
+
+		ParticleForGPU* newInstancingData = particleGroupIterator->second.instancingData_;
+
+		//particleGroupIterator->second.kNumInstance = 0;
 		// グループ内の全てのパーティクルについて処理する
 		for (std::list<Particle>::iterator particleIterator = particleGroupIterator->second.particles.begin();
 			particleIterator != particleGroupIterator->second.particles.end();) {
-			
+
 			// 寿命に達していたらグループから外す
 
 			// 場の影響を計算
@@ -78,14 +82,20 @@ void ParticleManager::Update()
 
 			// 経過時間を加算
 
-			// ワールド行列を計算
+			//if (particleGroupIterator->second.kNumInstance <= particleGroupIterator->second.kNumMaxInstance) {
+				// ワールド行列を計算
 			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particleIterator->transform.scale, particleIterator->transform.rotate, particleIterator->transform.translate);
 			// ワールドビュープロジェクション行列を合成
 			Matrix4x4 worldViewProjection = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 			// インスタンシング用データ1個分の書き込み
-			particleGroupIterator->second.instancingData_->WVP = worldViewProjection;
-			particleGroupIterator->second.instancingData_->World = worldMatrix;
 
+			newInstancingData->WVP = worldViewProjection;
+			newInstancingData->World = worldMatrix;
+			newInstancingData->color = particleIterator->color;
+			newInstancingData++;
+		
+				//++particleGroupIterator->second.kNumInstance;
+			//}
 			++particleIterator;
 		}
 	}
@@ -140,7 +150,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 	// インスタンシング用リソースの作成
 	// Instancing用のTransformationMatrixリソースを作る
-	particleGroup.instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(TransformationMatrix) * particleGroup.kNumInstance);
+	particleGroup.instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * particleGroup.kNumInstance);
 
 	particleGroup.instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleGroup.instancingData_));
 
@@ -148,13 +158,14 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	for (uint32_t index = 0; index < particleGroup.kNumInstance; ++index) {
 		particleGroup.instancingData_[index].WVP = MyMath::MakeIdentity4x4();
 		particleGroup.instancingData_[index].World = MyMath::MakeIdentity4x4();
+		particleGroup.instancingData_[index].color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 
 	// インスタンシング用にSRVを確保してSRVインデックスを記録
 	particleGroup.srvIndex = pSrvManager_->Allocate();
 
 	// SRV生成
-	pSrvManager_->CreateSRVforParticle(particleGroup.srvIndex,particleGroup.instancingResource_.Get(), sizeof(TransformationMatrix));
+	pSrvManager_->CreateSRVforStructuredBuffer(particleGroup.srvIndex,particleGroup.instancingResource_.Get(),particleGroup.kNumInstance, sizeof(ParticleForGPU));
 
 }
 
@@ -167,18 +178,21 @@ void ParticleManager::SetModel(const std::string filePath)
 Particle ParticleManager::MakeNewParticle(Vector3& translate)
 {
 	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
 	const float deltaTime = 1.0f / 60.0f;
 
 	Particle particle;
 	particle.transform.scale = { 1.0f,1.0f,1.0f };
 	particle.transform.rotate = { 0.0f,0.0f,0.0f };
-	particle.transform.translate = { translate };
 	// 発生場所
-	/*Vector3 randomTranslate{ distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
+	Vector3 randomTranslate{ distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
 	particle.transform.translate = randomTranslate + translate;
 	particle.velocity = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
+	
+	particle.transform.translate += particle.velocity * deltaTime;
 
-	particle.transform.translate += particle.velocity * deltaTime;*/
+	// 色を変更
+	particle.color = { distColor(randomEngine_),distColor(randomEngine_),distColor(randomEngine_),1.0f };
 
 	return particle;
 }

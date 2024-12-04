@@ -1,21 +1,26 @@
 #include "ParticleEmitter.h"
 #include "ParticleManager.h"
 
-void ParticleEmitter::Initialize()
+void ParticleEmitter::Initialize(const std::string name, const Vector3& position, uint32_t count)
 {
 	particleManager_ = ParticleManager::GetInstance();
 
+	// 引数で受け取ってメンバ変数に記録
+	groupName_ = name;
+	count_ = count;
+	position_ = position;
+
 	// 0.5秒ごとに発生
-	frequency = 0.5f;
+	frequency_ = 0.5f;
 	// 発生頻度用の時刻、0で初期化
-	frequencyTime = 0.0f;
+	frequencyTime_ = 0.0f;
+
+	Emit();
 }
 
-void ParticleEmitter::Update(const std::string name, const Vector3& position, uint32_t count)
+void ParticleEmitter::Update()
 {
 	particleManager_->Update();
-
-	Emit(name, position, count);
 
 	// 時刻を進める
 	//float deltaTime = 1.0f / 60.0f;
@@ -37,8 +42,8 @@ void ParticleEmitter::Draw()
 	particleManager_->Draw();
 }
 
-void ParticleEmitter::Emit(const std::string name, const Vector3& position, uint32_t count)
+void ParticleEmitter::Emit()
 {
 	// パーティクルマネージャから呼び出す
-	particleManager_->Emit(name, position, count);
+	particleManager_->Emit(groupName_, position_, count_);
 }

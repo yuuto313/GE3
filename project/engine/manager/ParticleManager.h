@@ -1,7 +1,7 @@
 #pragma once
 #include "DirectXCommon.h"
 #include "SrvManager.h"
-#include "TransformationMatrix.h"
+#include "ParticleForGPU.h"
 #include "MyMath.h"
 #include "Material.h"
 
@@ -14,6 +14,7 @@ class Model;
 struct Particle {
 	Transform transform;
 	Vector3 velocity;
+	Vector4 color;
 };
 
 struct ParticleGroup
@@ -22,8 +23,10 @@ struct ParticleGroup
 	std::list<Particle> particles;                             // パーティクルのリスト
 	uint32_t srvIndex;										   // インスタンシング用SRVインデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;// インスタンシングリソース
-	static const uint32_t kNumInstance = 10;				   // インスタンス数
-	TransformationMatrix* instancingData_ = nullptr;		   // インスタンシングデータを書き込むためのポインタ
+	static const uint32_t kNumInstance = 10;
+	//uint32_t kNumInstance = 0;						   // インスタンス数
+	//static const uint32_t kNumMaxInstance = 10;					   // 最大数
+	ParticleForGPU* instancingData_ = nullptr;		   // インスタンシングデータを書き込むためのポインタ
 };
 
 // 場
@@ -52,13 +55,13 @@ public:
 	/// </summary>
 	void CreateParticleGroup(const std::string name, const std::string textureFilePath);
 
-	static uint32_t GetNumInstance() { return ParticleGroup::kNumInstance; }
+	static uint32_t GetNumMaxInstance() { return ParticleGroup::kNumInstance; }
 
 	void SetModel(const std::string filePath);
 
 	void SetCamera(Camera* camera) { this->pCamera_ = camera; }
 
-private:
+private:// メンバ変数
 
 	DirectXCommon* pDxCommon_ = nullptr;
 	SrvManager* pSrvManager_ = nullptr;

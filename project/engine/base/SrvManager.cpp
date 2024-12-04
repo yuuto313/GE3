@@ -93,7 +93,7 @@ void SrvManager::CreateSRVforParticle(uint32_t srvIndex, ID3D12Resource* pResour
 	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
 	srvDesc.Buffer.FirstElement = 0;
 	srvDesc.Buffer.Flags = D3D12_BUFFER_SRV_FLAG_NONE;
-	srvDesc.Buffer.NumElements = ParticleManager::GetInstance()->GetNumInstance();
+	srvDesc.Buffer.NumElements = ParticleManager::GetInstance()->GetNumMaxInstance();
 	srvDesc.Buffer.StructureByteStride = structureByteStride;
 	
 	pDxCommon_->GetDevice()->CreateShaderResourceView(pResource, &srvDesc, GetCPUDescriptorHandle(srvIndex));

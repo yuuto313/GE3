@@ -38,14 +38,14 @@ void GameScene::Initialize()
 	ParticleManager::GetInstance()->SetCamera(camera_.get());
 	ParticleManager::GetInstance()->SetModel("plane.obj");
 	// パーティクルグループ生成
-	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "resource/eto_tora_family.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "resource/uvChecker.png");
 
 	//-------------------------------------
 	// パーティクルエミッタ生成
 	//-------------------------------------
 
 	particleEmitter_ = std::make_unique<ParticleEmitter>();
-	particleEmitter_->Initialize();
+	particleEmitter_->Initialize("Particle", { 0.1f,0.1f,0.1f }, 10);
 
 
 }
@@ -78,7 +78,7 @@ void GameScene::Update()
 	// パーティクルエミッターの更新
 	//-------------------------------------
 
-	particleEmitter_->Update("Particle", { -0.1f,0.1f,0.1f }, 10);
+	particleEmitter_->Update();
 
 }
 

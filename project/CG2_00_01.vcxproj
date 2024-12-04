@@ -141,6 +141,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\manager\ParticleManager.cpp" />
     <ClCompile Include="engine\common\ParticleCommon.cpp" />
     <ClCompile Include="ParticleEmitter.cpp" />
+    <ClCompile Include="ParticleForGPU.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="application\scene\factory\AbstractSceneFactory.h" />
@@ -193,6 +194,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\common\ParticleCommon.h" />
     <ClInclude Include="ModelData.h" />
     <ClInclude Include="ParticleEmitter.h" />
+    <ClInclude Include="ParticleForGPU.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

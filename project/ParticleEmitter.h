@@ -8,9 +8,9 @@ class ParticleEmitter
 {
 public:
 
-	void Initialize();
+	void Initialize(const std::string name, const Vector3& position, uint32_t count);
 
-	void Update(const std::string name,const Vector3& position,uint32_t count);
+	void Update();
 
 	void Draw();
 
@@ -18,12 +18,13 @@ private:
 
 	ParticleManager* particleManager_ = nullptr;
 
-	Transform transform;	// エミッタのTransform
-	uint32_t count;			// 発生数
-	float frequency;		// 発生頻度
-	float frequencyTime;	// 頻度用時刻
+	std::string groupName_;	// パーティクルグループ名
+	Vector3 position_;
+	uint32_t count_;		// 発生数
+	float frequency_;		// 発生頻度
+	float frequencyTime_;	// 頻度用時刻
 
 private:
-	void Emit(const std::string name, const Vector3& position, uint32_t count);
+	void Emit();
 };
 
