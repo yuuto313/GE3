@@ -104,7 +104,6 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="AABB.cpp" />
     <ClCompile Include="engine\3d\Camera.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
     <ClCompile Include="engine\io\D3DResourceLeakChecker.cpp" />
@@ -141,11 +140,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\manager\SceneManager.cpp" />
     <ClCompile Include="engine\manager\ParticleManager.cpp" />
     <ClCompile Include="engine\common\ParticleCommon.cpp" />
-    <ClCompile Include="ParticleEmitter.cpp" />
-    <ClCompile Include="ParticleForGPU.cpp" />
+    <ClCompile Include="engine\3d\ParticleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="AABB.h" />
+    <ClInclude Include="engine\math\AABB.h" />
     <ClInclude Include="application\scene\factory\AbstractSceneFactory.h" />
     <ClInclude Include="application\scene\base\BaseScene.h" />
     <ClInclude Include="engine\3d\Camera.h" />
@@ -194,9 +192,9 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\manager\SceneManager.h" />
     <ClInclude Include="engine\manager\ParticleManager.h" />
     <ClInclude Include="engine\common\ParticleCommon.h" />
-    <ClInclude Include="ModelData.h" />
-    <ClInclude Include="ParticleEmitter.h" />
-    <ClInclude Include="ParticleForGPU.h" />
+    <ClInclude Include="engine\math\ModelData.h" />
+    <ClInclude Include="engine\3d\ParticleEmitter.h" />
+    <ClInclude Include="engine\math\ParticleForGPU.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
