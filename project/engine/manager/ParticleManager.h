@@ -2,42 +2,16 @@
 #include "DirectXCommon.h"
 #include "SrvManager.h"
 #include "ModelManager.h"
-#include "ParticleForGPU.h"
-#include "MyMath.h"
-#include "Material.h"
-#include "AABB.h"
+#include "GameMath.h"
+#include "ParticleSystem.h"
+#include "Field.h"
 
 #include <random>
 
 class Camera;
 class Model;
 
-// Particle構造体
-struct Particle {
-	Transform transform;
-	Vector3 velocity;
-	Vector4 color;
-	float lifeTime;		// 生存可能時間
-	float currentTime;	// 発生してからの経過時間
-};
-
-struct ParticleGroup
-{
-	MaterialData materialData;                                 // マテリアルデータ
-	std::list<Particle> particles;                             // パーティクルのリスト
-	uint32_t srvIndex;										   // インスタンシング用SRVインデックス
-	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;// インスタンシングリソース
-	uint32_t kNumInstance = 0;								   // インスタンス数
-	static const uint32_t kNumMaxInstance = 100;				   // 最大数
-	ParticleForGPU* instancingData_ = nullptr;				   // インスタンシングデータを書き込むためのポインタ
-};
-
-// 場
-struct AccelerationField {
-	Vector3 acceleration;	// 加速度
-	AABB area;				// 範囲
-};
-
+using namespace GameMath;
 
 class ParticleManager
 {

@@ -1,5 +1,5 @@
 #pragma once
-#include "MyVector3.h"
+#include "Vector.h"
 
 //直方体
 //Axis Aligned Bounding Box（軸平行境界箱）

@@ -1,11 +1,11 @@
-#include "MyMath.h"
+#include "GameMath.h"
 
-float MyMath::cot(float other)
+float GameMath::cot(float other)
 {
 	return 1 / tan(other);
 }
 
-Matrix4x4 MyMath::MakeIdentity4x4()
+Matrix4x4 GameMath::MakeIdentity4x4()
 {
 	Matrix4x4 result{};
 	result.m[0][0] = 1.f;
@@ -15,7 +15,7 @@ Matrix4x4 MyMath::MakeIdentity4x4()
 	return result;
 }
 
-Matrix4x4 MyMath::Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
+Matrix4x4 GameMath::Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
 {
 	Matrix4x4 result{};
 	for (int i = 0; i < 4; i++) {
@@ -28,12 +28,12 @@ Matrix4x4 MyMath::Multiply(const Matrix4x4& m1, const Matrix4x4& m2)
 	return result;
 }
 
-float MyMath::Length(const Vector3& v)
+float GameMath::Length(const Vector3& v)
 {
 	return sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
-Vector3 MyMath::Normalize(const Vector3& v)
+Vector3 GameMath::Normalize(const Vector3& v)
 {
 	Vector3 result;
 	result.x = v.x / Length(v);
@@ -42,7 +42,7 @@ Vector3 MyMath::Normalize(const Vector3& v)
 	return Vector3(result);
 }
 
-Matrix4x4 MyMath::Inverse(const Matrix4x4& m)
+Matrix4x4 GameMath::Inverse(const Matrix4x4& m)
 {
 	Matrix4x4 result{};
 	float detA = m.m[0][0] * m.m[1][1] * m.m[2][2] * m.m[3][3] + m.m[0][0] * m.m[1][2] * m.m[2][3] * m.m[3][1] + m.m[0][0] * m.m[1][3] * m.m[2][1] * m.m[3][2]
@@ -77,7 +77,7 @@ Matrix4x4 MyMath::Inverse(const Matrix4x4& m)
 	return result;
 }
 
-Matrix4x4 MyMath::MakeTranslateMatrix(const Vector3& translate)
+Matrix4x4 GameMath::MakeTranslateMatrix(const Vector3& translate)
 {
 	Matrix4x4 result{};
 	result.m[0][0] = 1;
@@ -90,7 +90,7 @@ Matrix4x4 MyMath::MakeTranslateMatrix(const Vector3& translate)
 	return result;
 }
 
-Matrix4x4 MyMath::MakeScaleMatrix(const Vector3& scale)
+Matrix4x4 GameMath::MakeScaleMatrix(const Vector3& scale)
 {
 	Matrix4x4 result{};
 	result.m[0][0] = scale.x;
@@ -100,7 +100,7 @@ Matrix4x4 MyMath::MakeScaleMatrix(const Vector3& scale)
 	return result;
 }
 
-Matrix4x4 MyMath::MakeRotateXMatrix(float radian)
+Matrix4x4 GameMath::MakeRotateXMatrix(float radian)
 {
 	Matrix4x4 result{};
 
@@ -113,7 +113,7 @@ Matrix4x4 MyMath::MakeRotateXMatrix(float radian)
 	return result;
 }
 
-Matrix4x4 MyMath::MakeRotateYMatrix(float radian)
+Matrix4x4 GameMath::MakeRotateYMatrix(float radian)
 {
 	Matrix4x4 result{};
 	result.m[0][0] = std::cos(radian);
@@ -125,7 +125,7 @@ Matrix4x4 MyMath::MakeRotateYMatrix(float radian)
 	return result;
 }
 
-Matrix4x4 MyMath::MakeRotateZMatrix(float radian)
+Matrix4x4 GameMath::MakeRotateZMatrix(float radian)
 {
 	Matrix4x4 result{};
 	result.m[0][0] = std::cos(radian);
@@ -137,7 +137,7 @@ Matrix4x4 MyMath::MakeRotateZMatrix(float radian)
 	return result;
 }
 
-Matrix4x4 MyMath::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate)
+Matrix4x4 GameMath::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate)
 {
 	Matrix4x4 scaleMatrix = MakeScaleMatrix(scale);
 
@@ -152,7 +152,7 @@ Matrix4x4 MyMath::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, 
 	return worldMatrix;
 }
 
-Matrix4x4 MyMath::MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip)
+Matrix4x4 GameMath::MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip)
 {
 	Matrix4x4 result{};
 	result.m[0][0] = 2 / (right - left);
@@ -165,7 +165,7 @@ Matrix4x4 MyMath::MakeOrthographicMatrix(float left, float top, float right, flo
 	return result;
 }
 
-Matrix4x4 MyMath::MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth)
+Matrix4x4 GameMath::MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth)
 {
 	Matrix4x4 result{};
 	result.m[0][0] = width / 2;
@@ -178,7 +178,7 @@ Matrix4x4 MyMath::MakeViewportMatrix(float left, float top, float width, float h
 	return result;
 }
 
-Matrix4x4 MyMath::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip)
+Matrix4x4 GameMath::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float nearClip, float farClip)
 {
 	Matrix4x4 result{};
 	result.m[0][0] = 1 / aspectRatio * cot(fovY / 2);
@@ -189,7 +189,7 @@ Matrix4x4 MyMath::MakePerspectiveFovMatrix(float fovY, float aspectRatio, float 
 	return result;
 }
 
-bool MyMath::IsCollision(const AABB& aabb, const Vector3& point)
+bool GameMath::IsCollision(const AABB& aabb, const Vector3& point)
 {
 	// 未来の自分へ。全くもって正しいという保証なしです
 	if ((aabb.min.x <= point.x && aabb.max.x >= point.x) && //x軸

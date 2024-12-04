@@ -1,6 +1,7 @@
 #pragma once
 #include "TransformationMatrix.h"
-#include "MyTransform.h"
+#include "Transform.h"
+#include "DirectionalLight.h"
 
 #include "Model.h"
 #include "ModelManager.h"
@@ -10,12 +11,7 @@
 #include <wrl.h>
 #include <vector>
 
-//平行光源
-struct DirectionalLight{
-	Vector4 color;//ライトの色
-	Vector3 direction;//ライトの向き
-	float intensity;//輝度
-};
+using namespace GameMath;
 
 class Object3dCommon;
 

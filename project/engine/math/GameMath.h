@@ -4,19 +4,16 @@
 #include <cstdint>
 #include <format>
 
-#include "MyVector2.h"
-#include "MyVector3.h"
-#include "MyVector4.h"
-#include "MyMatrix3x3.h"
-#include "MyMatrix4x4.h"
-#include "MyTransform.h"
+#include "Vector.h"
+#include "Matrix.h"
+#include "Transform.h"
 #include "AABB.h"
 
 //-------------------------------------
 // 数学関数
 //-------------------------------------
 
-namespace MyMath{
+namespace GameMath{
 
 	/// <summary>
 	/// cotangent(cot)、tanの逆数

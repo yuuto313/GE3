@@ -1,9 +1,10 @@
 #pragma once
 #include "VertexData.h"
-#include "Material.h"
+#include "MaterialLibrary.h"
 #include "TransformationMatrix.h"
 #include "DirectXCommon.h"
 #include "SrvManager.h"
+#include "Transform.h"
 
 class SpriteCommon;
 
