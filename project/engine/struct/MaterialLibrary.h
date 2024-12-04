@@ -1,5 +1,10 @@
 #pragma once
-#include "MyMath.h"
+#include "Vector.h"
+#include "Matrix.h"
+#include <cstdint>
+#include <string>
+
+// マテリアル関連の構造体やデータをまとめたヘッダー
 
 /// <summary>
 /// マテリアル(構造体)

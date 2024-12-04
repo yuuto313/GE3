@@ -1,5 +1,6 @@
 #include "Model.h"
 #include "TextureManager.h"
+#include "GameMath.h"
 
 #include <cassert>
 #include <fstream>
@@ -118,7 +119,7 @@ void Model::CreateMaterialData()
 	// SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = false;
 	// 単位行列で初期化
-	materialData_->uvTransform = MyMath::MakeIdentity4x4();
+	materialData_->uvTransform = GameMath::MakeIdentity4x4();
 }
 
 MaterialData Model::LoadMaterialTemplateFile(const std::string& directoryPath, const std::string& filename)

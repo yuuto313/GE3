@@ -3,6 +3,7 @@
 #include "WinApp.h"
 #include "ImGuiManager.h"
 #include "TextureManager.h"
+#include "GameMath.h"
 
 Sprite::Sprite()
 {
@@ -273,7 +274,7 @@ void Sprite::CreateMaterialData()
 	// SpriteはLightingしないのでfalseを設定する
 	materialData_->enableLighting = false;
 	// 単位行列で初期化
-	materialData_->uvTransform = MyMath::MakeIdentity4x4();
+	materialData_->uvTransform = GameMath::MakeIdentity4x4();
 
 }
 
@@ -295,8 +296,8 @@ void Sprite::CreateTrasnformationMatrixData()
 	// 単位行列を書き込んでおく
 	//-------------------------------------
 
-	transformationMatrixData_->WVP = MyMath::MakeIdentity4x4();
-	transformationMatrixData_->World = MyMath::MakeIdentity4x4();
+	transformationMatrixData_->WVP = GameMath::MakeIdentity4x4();
+	transformationMatrixData_->World = GameMath::MakeIdentity4x4();
 
 }
 
@@ -310,21 +311,21 @@ void Sprite::CreateWVPMatrix()
 	// TransformからWorldMatrixを作る
 	//-------------------------------------
 
-	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 worldMatrix = GameMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
 	//-------------------------------------
 	// ViewMatrixを作って単位行列を代入
 	//-------------------------------------
 
-	Matrix4x4 viewMatrix = MyMath::MakeIdentity4x4();
+	Matrix4x4 viewMatrix = GameMath::MakeIdentity4x4();
 
 	//-------------------------------------
 	// ProjectionMatrixを作って並行投影行列を書き込む
 	//-------------------------------------
 
-	Matrix4x4 projectionMatrix = MyMath::MakeOrthographicMatrix(0.0f,0.0f, float(WinApp::kClientWidth) ,float(WinApp::kClientHeight), 0.0f, 100.f);
+	Matrix4x4 projectionMatrix = GameMath::MakeOrthographicMatrix(0.0f,0.0f, float(WinApp::kClientWidth) ,float(WinApp::kClientHeight), 0.0f, 100.f);
 
-	Matrix4x4 wvpMatrix = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
+	Matrix4x4 wvpMatrix = GameMath::Multiply(worldMatrix, GameMath::Multiply(viewMatrix, projectionMatrix));
 	transformationMatrixData_->WVP = wvpMatrix;
 	transformationMatrixData_->World = worldMatrix;
 }

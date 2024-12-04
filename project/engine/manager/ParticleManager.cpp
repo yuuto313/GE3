@@ -57,9 +57,9 @@ void ParticleManager::Update()
 
 	// ビルボード行列の計算
 	// Y軸でπ/2回転させる
-	Matrix4x4 backToFrontMatrix = MyMath::MakeRotateYMatrix(std::numbers::pi_v<float>);
+	Matrix4x4 backToFrontMatrix = MakeRotateYMatrix(std::numbers::pi_v<float>);
 	// カメラの回転を適用する
-	Matrix4x4 billboardMatrix = MyMath::Multiply(backToFrontMatrix, pCamera_->GetWorldMatrix());
+	Matrix4x4 billboardMatrix = Multiply(backToFrontMatrix, pCamera_->GetWorldMatrix());
 	// 平行移動成分はいらない
 	billboardMatrix.m[3][0] = 0.0f;
 	billboardMatrix.m[3][1] = 0.0f;
@@ -87,7 +87,7 @@ void ParticleManager::Update()
 				particleIterator = particleGroupIterator->second.particles.erase(particleIterator);
 			} else {
 				// 場の影響を計算
-				if (MyMath::IsCollision(accelerationField_.area, particleIterator->transform.translate)) {
+				if (IsCollision(accelerationField_.area, particleIterator->transform.translate)) {
 					particleIterator->velocity += accelerationField_.acceleration * deltaTime;
 				}
 				// 移動処理
@@ -97,12 +97,12 @@ void ParticleManager::Update()
 				float alpha = 1.0f - (particleIterator->currentTime / particleIterator->lifeTime);
 				if (particleGroupIterator->second.kNumInstance <= particleGroupIterator->second.kNumMaxInstance) {
 					// ワールド行列を計算
-					Matrix4x4 scaleMatrix = MyMath::MakeScaleMatrix(particleIterator->transform.scale);
-					Matrix4x4 translateMatrix = MyMath::MakeTranslateMatrix(particleIterator->transform.translate);
-					Matrix4x4 worldMatrix = MyMath::Multiply(scaleMatrix, MyMath::Multiply(billboardMatrix, translateMatrix));
+					Matrix4x4 scaleMatrix = MakeScaleMatrix(particleIterator->transform.scale);
+					Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->transform.translate);
+					Matrix4x4 worldMatrix = Multiply(scaleMatrix, Multiply(billboardMatrix, translateMatrix));
 
 					// ワールドビュープロジェクション行列を合成
-					Matrix4x4 worldViewProjection = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
+					Matrix4x4 worldViewProjection = Multiply(worldMatrix, Multiply(viewMatrix, projectionMatrix));
 
 					// インスタンシング用データ1個分の書き込み
 					newInstancingData->WVP = worldViewProjection;
@@ -175,8 +175,8 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 	// 単位行列とNoneBlendで書き込んでおく
 	for (uint32_t index = 0; index < particleGroup.kNumMaxInstance; ++index) {
-		particleGroup.instancingData_[index].WVP = MyMath::MakeIdentity4x4();
-		particleGroup.instancingData_[index].World = MyMath::MakeIdentity4x4();
+		particleGroup.instancingData_[index].WVP = GameMath::MakeIdentity4x4();
+		particleGroup.instancingData_[index].World = GameMath::MakeIdentity4x4();
 		particleGroup.instancingData_[index].color = { 1.0f,1.0f,1.0f,1.0f };
 	}
 

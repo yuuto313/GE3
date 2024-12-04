@@ -1,7 +1,7 @@
 #pragma once
 #include "ModelCommon.h"
 #include "VertexData.h"
-#include "Material.h"
+#include "MaterialLibrary.h"
 #include "SrvManager.h"
 #include "ModelData.h"
 

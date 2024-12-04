@@ -1,5 +1,5 @@
 #pragma once
-#include "MyMath.h"
+#include "Vector.h"
 
 struct VertexData final{
 	Vector4 position;
