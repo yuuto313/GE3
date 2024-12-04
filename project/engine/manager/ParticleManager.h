@@ -44,6 +44,9 @@ public:
 
 	static uint32_t GetNumMaxInstance() { return ParticleGroup::kNumMaxInstance; }
 
+	// パーティクルグループのテクスチャを切り替える
+	void SetTexture(const std::string& name, const std::string& newTextureFilePath);
+
 	void SetModel(const std::string filePath){ pModel = ModelManager::GetInstance()->FindModel(filePath); }
 
 	void SetCamera(Camera* camera) { this->pCamera_ = camera; }

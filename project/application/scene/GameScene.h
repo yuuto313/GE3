@@ -41,5 +41,10 @@ public:
 private:
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
+
+	// 仮
+	bool changeTexture_ = false;
+	std::string textureFilePath_;
+
 };
 
