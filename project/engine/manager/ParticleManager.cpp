@@ -91,7 +91,10 @@ void ParticleManager::Update()
 				float alpha = 1.0f - (particleIterator->currentTime / particleIterator->lifeTime);
 				if (particleGroupIterator->second.kNumInstance <= particleGroupIterator->second.kNumMaxInstance) {
 					// ワールド行列を計算
-					Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particleIterator->transform.scale, particleIterator->transform.rotate, particleIterator->transform.translate);
+					Matrix4x4 scaleMatrix = MyMath::MakeScaleMatrix(particleIterator->transform.scale);
+					Matrix4x4 translateMatrix = MyMath::MakeTranslateMatrix(particleIterator->transform.translate);
+					Matrix4x4 worldMatrix = MyMath::Multiply(scaleMatrix, MyMath::Multiply(billboardMatrix, translateMatrix));
+
 					// ワールドビュープロジェクション行列を合成
 					Matrix4x4 worldViewProjection = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 
