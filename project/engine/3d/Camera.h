@@ -1,7 +1,9 @@
 #pragma once
-#include "MyTransform.h"
-#include "MyMatrix4x4.h"
-#include "MyMath.h"
+#include "Transform.h"
+#include "Matrix.h"
+#include "GameMath.h"
+
+using namespace GameMath;
 
 class Camera
 {

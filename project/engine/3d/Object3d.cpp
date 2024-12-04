@@ -94,8 +94,8 @@ void Object3d::CreateTrasnformationMatrixData()
 	// 単位行列を書き込んでおく
 	//-------------------------------------
 
-	transformationMatrixData_->WVP = MyMath::MakeIdentity4x4();
-	transformationMatrixData_->World = MyMath::MakeIdentity4x4();
+	transformationMatrixData_->WVP = MakeIdentity4x4();
+	transformationMatrixData_->World = MakeIdentity4x4();
 }
 
 void Object3d::CreateDirectionalLightData()
@@ -117,7 +117,7 @@ void Object3d::CreateDirectionalLightData()
 	//-------------------------------------
 
 	directionalLightData_->color = { 1.0f,1.0f,1.0f };
-	directionalLightData_->direction = MyMath::Normalize({ 0.0f,-1.0f,0.0f });
+	directionalLightData_->direction = Normalize({ 0.0f,-1.0f,0.0f });
 	directionalLightData_->intensity = 1.0f;
 }
 
@@ -127,7 +127,7 @@ void Object3d::CreateWVPMatrix()
 	// TransformからWorldMatrixを作る
 	//-------------------------------------
 
-	Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
 
 	//-------------------------------------
 	// worldViewProjectionMatrixを作成
@@ -135,7 +135,7 @@ void Object3d::CreateWVPMatrix()
 
 	if (pCamera_) {
 		const Matrix4x4& viewProjectionMatrix = pCamera_->GetViewProjectionMatrix();
-		worldViewProjectionMatrix_ = MyMath::Multiply(worldMatrix, viewProjectionMatrix);
+		worldViewProjectionMatrix_ = Multiply(worldMatrix, viewProjectionMatrix);
 	} else {
 		worldViewProjectionMatrix_ = worldMatrix;
 	}

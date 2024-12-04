@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -63,7 +63,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\struct;$(ProjectDir)engine\struct\geometory;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -87,7 +87,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\struct;$(ProjectDir)engine\struct\geometory;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -122,7 +122,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\base\OYFramework.cpp" />
     <ClCompile Include="application\scene\GameScene.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="engine\math\MyMath.cpp" />
+    <ClCompile Include="engine\math\GameMath.cpp" />
     <ClCompile Include="engine\io\ResourceObject.cpp" />
     <ClCompile Include="engine\2d\Sprite.cpp" />
     <ClCompile Include="engine\common\SpriteCommon.cpp" />
@@ -143,7 +143,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\ParticleEmitter.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="engine\math\AABB.h" />
+    <ClInclude Include="engine\struct\DirectionalLight.h" />
+    <ClInclude Include="engine\struct\geometory\AABB.h" />
     <ClInclude Include="application\scene\factory\AbstractSceneFactory.h" />
     <ClInclude Include="application\scene\base\BaseScene.h" />
     <ClInclude Include="engine\3d\Camera.h" />
@@ -161,21 +162,16 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\manager\ImGuiManager.h" />
     <ClInclude Include="engine\input\Input.h" />
     <ClInclude Include="engine\io\Logger.h" />
-    <ClInclude Include="engine\math\Material.h" />
-    <ClInclude Include="engine\math\MyMath.h" />
-    <ClInclude Include="engine\math\MyMatrix3x3.h" />
-    <ClInclude Include="engine\math\MyMatrix4x4.h" />
-    <ClInclude Include="engine\math\MyTransform.h" />
-    <ClInclude Include="engine\math\MyVector2.h" />
-    <ClInclude Include="engine\math\MyVector3.h" />
-    <ClInclude Include="engine\math\MyVector4.h" />
+    <ClInclude Include="engine\struct\MaterialLibrary.h" />
+    <ClInclude Include="engine\math\GameMath.h" />
+    <ClInclude Include="engine\struct\geometory\Transform.h" />
     <ClInclude Include="engine\io\ResourceObject.h" />
     <ClInclude Include="engine\2d\Sprite.h" />
     <ClInclude Include="engine\common\SpriteCommon.h" />
     <ClInclude Include="engine\base\StringUtility.h" />
-    <ClInclude Include="engine\math\TransformationMatrix.h" />
-    <ClInclude Include="engine\math\VertexData.h" />
-    <ClInclude Include="engine\audio\WavFile.h" />
+    <ClInclude Include="engine\struct\TransformationMatrix.h" />
+    <ClInclude Include="engine\struct\VertexData.h" />
+    <ClInclude Include="engine\struct\WavFile.h" />
     <ClInclude Include="engine\base\WinApp.h" />
     <ClInclude Include="engine\manager\TextureManager.h" />
     <ClInclude Include="engine\3d\Object3d.h" />
@@ -192,9 +188,13 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\scene\manager\SceneManager.h" />
     <ClInclude Include="engine\manager\ParticleManager.h" />
     <ClInclude Include="engine\common\ParticleCommon.h" />
-    <ClInclude Include="engine\math\ModelData.h" />
+    <ClInclude Include="engine\struct\ModelData.h" />
     <ClInclude Include="engine\3d\ParticleEmitter.h" />
-    <ClInclude Include="engine\math\ParticleForGPU.h" />
+    <ClInclude Include="engine\struct\ParticleForGPU.h" />
+    <ClInclude Include="engine\struct\geometory\Vector.h" />
+    <ClInclude Include="engine\struct\geometory\Matrix.h" />
+    <ClInclude Include="engine\struct\ParticleSystem.h" />
+    <ClInclude Include="engine\struct\Field.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
