@@ -202,7 +202,8 @@ Particle ParticleManager::MakeNewParticle(const Vector3& translate)
 	particle.transform.scale = { 1.0f,1.0f,1.0f };
 	particle.transform.rotate = { 0.0f,0.0f,0.0f };
 	// 発生場所
-	particle.transform.translate = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
+	Vector3 randomTranslate = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
+	particle.transform.translate = translate + randomTranslate;
 	particle.velocity = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
 
 	// 色を変更

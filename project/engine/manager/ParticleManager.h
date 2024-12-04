@@ -26,7 +26,7 @@ struct ParticleGroup
 	uint32_t srvIndex;										   // インスタンシング用SRVインデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;// インスタンシングリソース
 	uint32_t kNumInstance = 0;								   // インスタンス数
-	static const uint32_t kNumMaxInstance = 10;				   // 最大数
+	static const uint32_t kNumMaxInstance = 100;				   // 最大数
 	ParticleForGPU* instancingData_ = nullptr;				   // インスタンシングデータを書き込むためのポインタ
 };
 

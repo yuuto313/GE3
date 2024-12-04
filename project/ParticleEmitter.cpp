@@ -1,14 +1,19 @@
 #include "ParticleEmitter.h"
 #include "ParticleManager.h"
+#include "ImGuiManager.h"
 
-void ParticleEmitter::Initialize(const std::string name, const Vector3& position, uint32_t count)
+void ParticleEmitter::Initialize(const std::string name, const Vector3& translate, uint32_t count)
 {
 	particleManager_ = ParticleManager::GetInstance();
 
 	// 引数で受け取ってメンバ変数に記録
 	groupName_ = name;
 	count_ = count;
-	position_ = position;
+
+	// Emitterの情報を初期化
+	transform_.scale = { 1.0f,1.0f,1.0f };
+	transform_.rotate = { 0.0f,0.0f,0.0f };
+	transform_.translate = translate;
 
 	// 0.5秒ごとに発生
 	frequency_ = 0.5f;
@@ -23,14 +28,20 @@ void ParticleEmitter::Update()
 	particleManager_->Update();
 
 	// 時刻を進める
-	//float deltaTime = 1.0f / 60.0f;
-	//frequencyTime += deltaTime;
-	//// 発生頻度より大きいなら発生
-	//if (frequency <= frequencyTime) {
-	//	Emit(name, position, count);
-	//	// 余計に過ぎた時間も加味して頻度計算する
-	//	frequencyTime -= frequency;
-	//}
+	float deltaTime = 1.0f / 60.0f;
+	frequencyTime_ += deltaTime;
+	// 発生頻度より大きいなら発生
+	if (frequency_ <= frequencyTime_) {
+		// 発生処理
+		Emit();
+		// 余計に過ぎた時間も加味して頻度計算する
+		frequencyTime_ -= frequency_;
+	}
+
+	ImGui::Begin("Emitter");
+	ImGui::DragFloat3("EmitterTranslate", &transform_.translate.x, 0.01, -100.0f, 100.0f);
+	ImGui::End();
+
 }
 
 void ParticleEmitter::Draw()
@@ -45,5 +56,5 @@ void ParticleEmitter::Draw()
 void ParticleEmitter::Emit()
 {
 	// パーティクルマネージャから呼び出す
-	particleManager_->Emit(groupName_, position_, count_);
+	particleManager_->Emit(groupName_, transform_.translate, count_);
 }
