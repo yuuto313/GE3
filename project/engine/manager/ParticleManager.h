@@ -4,6 +4,7 @@
 #include "ParticleForGPU.h"
 #include "MyMath.h"
 #include "Material.h"
+#include "AABB.h"
 
 #include <random>
 
@@ -31,6 +32,11 @@ struct ParticleGroup
 };
 
 // 場
+struct AccelerationField {
+	Vector3 acceleration;	// 加速度
+	AABB area;				// 範囲
+};
+
 
 class ParticleManager
 {
@@ -75,6 +81,9 @@ private:// メンバ変数
 
 	// パーティクルグループ
 	std::unordered_map<std::string, ParticleGroup> particleGroup_;
+
+	// フィールド
+	AccelerationField accelerationField_;
 
 private:// メンバ関数
 

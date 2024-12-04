@@ -31,6 +31,11 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	// パイプライン生成はParticleCommon内で実装
 	ParticleCommon::GetInstance()->Initialize(pDxCommon_);
 
+	// フィールドを生成
+	accelerationField_.acceleration = { 15.0f,0.0f,0.0f };
+	accelerationField_.area.min = { -1.0f,-1.0f,-1.0f };
+	accelerationField_.area.max = { 1.0f,1.0f,1.0f };
+
 }
 
 void ParticleManager::Finalize()
@@ -83,7 +88,9 @@ void ParticleManager::Update()
 				particleIterator = particleGroupIterator->second.particles.erase(particleIterator);
 			} else {
 				// 場の影響を計算
-
+				if (MyMath::IsCollision(accelerationField_.area, particleIterator->transform.translate)) {
+					particleIterator->velocity += accelerationField_.acceleration * deltaTime;
+				}
 				// 移動処理
 				particleIterator->transform.translate += particleIterator->velocity * deltaTime;
 				// 経過時間を加算

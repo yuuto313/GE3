@@ -39,7 +39,7 @@ void ParticleEmitter::Update()
 	}
 
 	ImGui::Begin("Emitter");
-	ImGui::DragFloat3("EmitterTranslate", &transform_.translate.x, 0.01, -100.0f, 100.0f);
+	ImGui::DragFloat3("EmitterTranslate", &transform_.translate.x, 0.01f, -100.0f, 100.0f);
 	ImGui::End();
 
 }
