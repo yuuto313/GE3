@@ -46,13 +46,14 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	particleEmitter_ = std::make_unique<ParticleEmitter>();
-	particleEmitter_->Initialize("Particle", {}, 5);
+	particleEmitter_->Initialize("Particle", {0.0f,0.0f,0.0f}, 5);
 
 
 }
 
 void GameScene::Finalize()
 {
+	ParticleManager::GetInstance()->Reset();
 }
 
 void GameScene::Update()

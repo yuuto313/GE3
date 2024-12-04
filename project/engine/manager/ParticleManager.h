@@ -1,6 +1,7 @@
 #pragma once
 #include "DirectXCommon.h"
 #include "SrvManager.h"
+#include "ModelManager.h"
 #include "ParticleForGPU.h"
 #include "MyMath.h"
 #include "Material.h"
@@ -62,9 +63,14 @@ public:
 	/// </summary>
 	void CreateParticleGroup(const std::string name, const std::string textureFilePath);
 
+	/// <summary>
+	/// パーティクルグループをリセット
+	/// </summary>
+	void Reset();
+
 	static uint32_t GetNumMaxInstance() { return ParticleGroup::kNumMaxInstance; }
 
-	void SetModel(const std::string filePath);
+	void SetModel(const std::string filePath){ pModel = ModelManager::GetInstance()->FindModel(filePath); }
 
 	void SetCamera(Camera* camera) { this->pCamera_ = camera; }
 

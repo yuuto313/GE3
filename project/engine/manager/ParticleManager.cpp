@@ -1,6 +1,5 @@
 #include "ParticleManager.h"
 #include "TextureManager.h"
-#include "ModelManager.h"
 #include "ParticleCommon.h"
 #include "Camera.h"
 #include "Model.h"
@@ -189,10 +188,19 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 }
 
-void ParticleManager::SetModel(const std::string filePath)
+void ParticleManager::Reset()
 {
-	// モデルの情報を得る
-	pModel = ModelManager::GetInstance()->FindModel(filePath);
+	// リソースの解放
+	for (std::unordered_map<std::string, ParticleGroup>::iterator particleGroupIterator = particleGroup_.begin();
+		particleGroupIterator != particleGroup_.end();
+		++particleGroupIterator) {
+		if (particleGroupIterator->second.instancingResource_) {
+			particleGroupIterator->second.instancingResource_->Unmap(0, nullptr);
+			particleGroupIterator->second.instancingResource_.Reset();
+		}
+	}
+	// パーティクルグループに保持されているすべてのパーティクルグループと、それに関連付けられたリソースを削除
+	particleGroup_.clear();
 }
 
 Particle ParticleManager::MakeNewParticle(const Vector3& translate)

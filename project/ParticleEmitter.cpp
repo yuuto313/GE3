@@ -33,7 +33,7 @@ void ParticleEmitter::Update()
 	// 発生頻度より大きいなら発生
 	if (frequency_ <= frequencyTime_) {
 		// 発生処理
-		Emit();
+		particleManager_->Emit(groupName_, transform_.translate, count_);
 		// 余計に過ぎた時間も加味して頻度計算する
 		frequencyTime_ -= frequency_;
 	}
@@ -55,6 +55,6 @@ void ParticleEmitter::Draw()
 
 void ParticleEmitter::Emit()
 {
-	// パーティクルマネージャから呼び出す
+	// パーティクルマネージャから呼び出すだけ
 	particleManager_->Emit(groupName_, transform_.translate, count_);
 }
