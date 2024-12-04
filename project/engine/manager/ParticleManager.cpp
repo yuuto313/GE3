@@ -184,7 +184,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	particleGroup.srvIndex = pSrvManager_->Allocate();
 
 	// SRV生成
-	pSrvManager_->CreateSRVforStructuredBuffer(particleGroup.srvIndex,particleGroup.instancingResource_.Get(),particleGroup.kNumMaxInstance, sizeof(ParticleForGPU));
+	pSrvManager_->CreateSRVforStructuredBuffer(particleGroup.srvIndex, particleGroup.instancingResource_.Get(), particleGroup.kNumMaxInstance, sizeof(ParticleForGPU));
 
 }
 
@@ -201,6 +201,22 @@ void ParticleManager::Reset()
 	}
 	// パーティクルグループに保持されているすべてのパーティクルグループと、それに関連付けられたリソースを削除
 	particleGroup_.clear();
+}
+
+void ParticleManager::SetTexture(const std::string& name, const std::string& newTextureFilePath)
+{
+	// パーティクルグループが存在するかチェック
+	if (particleGroup_.contains(name)) {
+		ParticleGroup& particleGroup = particleGroup_[name];
+
+		// 新しいテクスチャファイルパスを設定
+		particleGroup.materialData.textureFilePath = newTextureFilePath;
+
+		// 新しいテクスチャのSRVインデックスを記録
+		particleGroup.materialData.textureIndex = TextureManager::GetInstance()->GetSrvIndex(newTextureFilePath);
+
+		// ここで新しいテクスチャに関連するリソースを更新する場合は、再生成などの処理を追加することも可能
+	}
 }
 
 Particle ParticleManager::MakeNewParticle(const Vector3& translate)
