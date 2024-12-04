@@ -2,12 +2,14 @@
 #include "SceneManager.h"
 #include "TextureManager.h"
 #include "ModelManager.h"
+#include "ImGuiManager.h"
 #include "SpriteCommon.h"
 #include "Object3dCommon.h"
 #include "ParticleCommon.h"
 
 void GameScene::Initialize()
 {
+
 	//-------------------------------------
 	// テクスチャファイルの読み込み
 	//-------------------------------------
@@ -39,7 +41,7 @@ void GameScene::Initialize()
 	ParticleManager::GetInstance()->SetCamera(camera_.get());
 	ParticleManager::GetInstance()->SetModel("plane.obj");
 	// パーティクルグループ生成
-	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "resource/circle.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("Particle", textureFilePath_);
 
 	//-------------------------------------
 	// パーティクルエミッタ生成
@@ -79,12 +81,27 @@ void GameScene::Update()
 	// パーティクルエミッターの更新
 	//-------------------------------------
 
+	ParticleManager::GetInstance()->SetTexture("Particle", textureFilePath_);
 	particleEmitter_->Update();
 
 }
 
 void GameScene::ImGui()
 {
+	ImGui::Begin("Particle");
+
+	// チェックボックスでテクスチャを変更
+	ImGui::Checkbox("Change Texture", &changeTexture_);
+
+	// テクスチャを変更する
+	if (changeTexture_) {
+		textureFilePath_ = "resource/circle.png";  // 切り替えるテクスチャのパス
+	} else {
+		textureFilePath_ = "resource/uvChecker.png";
+	}
+
+	ImGui::End();
+
 }
 
 void GameScene::Draw()
