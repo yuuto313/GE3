@@ -15,6 +15,7 @@ void GameScene::Initialize()
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
 	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
 	TextureManager::GetInstance()->LoadTexture("resource/eto_tora_family.png");
+	TextureManager::GetInstance()->LoadTexture("resource/circle.png");
 	
 	//-------------------------------------
 	// 3dモデルの読み込み
@@ -38,14 +39,14 @@ void GameScene::Initialize()
 	ParticleManager::GetInstance()->SetCamera(camera_.get());
 	ParticleManager::GetInstance()->SetModel("plane.obj");
 	// パーティクルグループ生成
-	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "resource/uvChecker.png");
+	ParticleManager::GetInstance()->CreateParticleGroup("Particle", "resource/circle.png");
 
 	//-------------------------------------
 	// パーティクルエミッタ生成
 	//-------------------------------------
 
 	particleEmitter_ = std::make_unique<ParticleEmitter>();
-	particleEmitter_->Initialize("Particle", { 0.1f,0.1f,0.1f }, 10);
+	particleEmitter_->Initialize("Particle", {}, 10);
 
 
 }

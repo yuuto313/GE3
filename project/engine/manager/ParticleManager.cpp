@@ -48,6 +48,9 @@ void ParticleManager::Finalize()
 
 void ParticleManager::Update()
 {
+
+	const float deltaTime = 1.0f / 60.0f;
+
 	// ビルボード行列の計算
 	// Y軸でπ/2回転させる
 	Matrix4x4 backToFrontMatrix = MyMath::MakeRotateYMatrix(std::numbers::pi_v<float>);
@@ -68,35 +71,42 @@ void ParticleManager::Update()
 		++particleGroupIterator){
 
 		ParticleForGPU* newInstancingData = particleGroupIterator->second.instancingData_;
+		// 描画すべきインスタンス数
+		particleGroupIterator->second.kNumInstance = 0;
 
-		//particleGroupIterator->second.kNumInstance = 0;
 		// グループ内の全てのパーティクルについて処理する
 		for (std::list<Particle>::iterator particleIterator = particleGroupIterator->second.particles.begin();
 			particleIterator != particleGroupIterator->second.particles.end();) {
 
 			// 寿命に達していたらグループから外す
+			if (particleIterator->lifeTime <= particleIterator->currentTime) {
+				particleIterator = particleGroupIterator->second.particles.erase(particleIterator);
+			} else {
+				// 場の影響を計算
 
-			// 場の影響を計算
+				// 移動処理
+				particleIterator->transform.translate += particleIterator->velocity * deltaTime;
+				// 経過時間を加算
+				particleIterator->currentTime += deltaTime;
+				float alpha = 1.0f - (particleIterator->currentTime / particleIterator->lifeTime);
+				if (particleGroupIterator->second.kNumInstance <= particleGroupIterator->second.kNumMaxInstance) {
+					// ワールド行列を計算
+					Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particleIterator->transform.scale, particleIterator->transform.rotate, particleIterator->transform.translate);
+					// ワールドビュープロジェクション行列を合成
+					Matrix4x4 worldViewProjection = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
 
-			// 移動処理
+					// インスタンシング用データ1個分の書き込み
+					newInstancingData->WVP = worldViewProjection;
+					newInstancingData->World = worldMatrix;
+					newInstancingData->color = particleIterator->color;
+					newInstancingData->color.w = alpha;
+					newInstancingData++;
 
-			// 経過時間を加算
-
-			//if (particleGroupIterator->second.kNumInstance <= particleGroupIterator->second.kNumMaxInstance) {
-				// ワールド行列を計算
-			Matrix4x4 worldMatrix = MyMath::MakeAffineMatrix(particleIterator->transform.scale, particleIterator->transform.rotate, particleIterator->transform.translate);
-			// ワールドビュープロジェクション行列を合成
-			Matrix4x4 worldViewProjection = MyMath::Multiply(worldMatrix, MyMath::Multiply(viewMatrix, projectionMatrix));
-			// インスタンシング用データ1個分の書き込み
-
-			newInstancingData->WVP = worldViewProjection;
-			newInstancingData->World = worldMatrix;
-			newInstancingData->color = particleIterator->color;
-			newInstancingData++;
-		
-				//++particleGroupIterator->second.kNumInstance;
-			//}
-			++particleIterator;
+					// 生きているParticleの数を1つカウントする
+					++particleGroupIterator->second.kNumInstance;
+				}
+				++particleIterator;
+			}
 		}
 	}
 
@@ -150,12 +160,12 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 
 	// インスタンシング用リソースの作成
 	// Instancing用のTransformationMatrixリソースを作る
-	particleGroup.instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * particleGroup.kNumInstance);
+	particleGroup.instancingResource_ = pDxCommon_->CreateBufferResource(sizeof(ParticleForGPU) * particleGroup.kNumMaxInstance);
 
 	particleGroup.instancingResource_->Map(0, nullptr, reinterpret_cast<void**>(&particleGroup.instancingData_));
 
-	// 単位行列を書き込んでおく
-	for (uint32_t index = 0; index < particleGroup.kNumInstance; ++index) {
+	// 単位行列とNoneBlendで書き込んでおく
+	for (uint32_t index = 0; index < particleGroup.kNumMaxInstance; ++index) {
 		particleGroup.instancingData_[index].WVP = MyMath::MakeIdentity4x4();
 		particleGroup.instancingData_[index].World = MyMath::MakeIdentity4x4();
 		particleGroup.instancingData_[index].color = { 1.0f,1.0f,1.0f,1.0f };
@@ -165,7 +175,7 @@ void ParticleManager::CreateParticleGroup(const std::string name, const std::str
 	particleGroup.srvIndex = pSrvManager_->Allocate();
 
 	// SRV生成
-	pSrvManager_->CreateSRVforStructuredBuffer(particleGroup.srvIndex,particleGroup.instancingResource_.Get(),particleGroup.kNumInstance, sizeof(ParticleForGPU));
+	pSrvManager_->CreateSRVforStructuredBuffer(particleGroup.srvIndex,particleGroup.instancingResource_.Get(),particleGroup.kNumMaxInstance, sizeof(ParticleForGPU));
 
 }
 
@@ -175,24 +185,28 @@ void ParticleManager::SetModel(const std::string filePath)
 	pModel = ModelManager::GetInstance()->FindModel(filePath);
 }
 
-Particle ParticleManager::MakeNewParticle(Vector3& translate)
+Particle ParticleManager::MakeNewParticle(const Vector3& translate)
 {
+	// 位置
 	std::uniform_real_distribution<float> distribution(-1.0f, 1.0f);
+	// 色
 	std::uniform_real_distribution<float> distColor(0.0f, 1.0f);
-	const float deltaTime = 1.0f / 60.0f;
+	// 生存時間
+	std::uniform_real_distribution<float> distTime(1.0f, 3.0f);
 
+	// パーティクルを1つ生成
 	Particle particle;
 	particle.transform.scale = { 1.0f,1.0f,1.0f };
 	particle.transform.rotate = { 0.0f,0.0f,0.0f };
 	// 発生場所
-	Vector3 randomTranslate{ distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
-	particle.transform.translate = randomTranslate + translate;
+	particle.transform.translate = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
 	particle.velocity = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
-	
-	particle.transform.translate += particle.velocity * deltaTime;
 
 	// 色を変更
 	particle.color = { distColor(randomEngine_),distColor(randomEngine_),distColor(randomEngine_),1.0f };
+	// 1~3秒間生存
+	particle.lifeTime = distTime(randomEngine_);
+	particle.currentTime = 0;
 
 	return particle;
 }
@@ -204,7 +218,6 @@ void ParticleManager::Emit(const std::string name, const Vector3& translate, uin
 
 	// 新たなパーティクルを作成し、指定されたパーティクルグループに登録
 	for (uint32_t index = 0; index < count; ++index) {
-		Vector3 newTranslate = { index * translate.x,index * translate.y,index * translate.z };
-		particleGroup_[name].particles.push_back(MakeNewParticle(newTranslate));
+		particleGroup_[name].particles.push_back(MakeNewParticle(translate));
 	}
 }

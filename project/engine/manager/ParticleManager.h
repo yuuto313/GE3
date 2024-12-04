@@ -15,6 +15,8 @@ struct Particle {
 	Transform transform;
 	Vector3 velocity;
 	Vector4 color;
+	float lifeTime;		// 生存可能時間
+	float currentTime;	// 発生してからの経過時間
 };
 
 struct ParticleGroup
@@ -23,10 +25,9 @@ struct ParticleGroup
 	std::list<Particle> particles;                             // パーティクルのリスト
 	uint32_t srvIndex;										   // インスタンシング用SRVインデックス
 	Microsoft::WRL::ComPtr<ID3D12Resource> instancingResource_;// インスタンシングリソース
-	static const uint32_t kNumInstance = 10;
-	//uint32_t kNumInstance = 0;						   // インスタンス数
-	//static const uint32_t kNumMaxInstance = 10;					   // 最大数
-	ParticleForGPU* instancingData_ = nullptr;		   // インスタンシングデータを書き込むためのポインタ
+	uint32_t kNumInstance = 0;								   // インスタンス数
+	static const uint32_t kNumMaxInstance = 10;				   // 最大数
+	ParticleForGPU* instancingData_ = nullptr;				   // インスタンシングデータを書き込むためのポインタ
 };
 
 // 場
@@ -55,7 +56,7 @@ public:
 	/// </summary>
 	void CreateParticleGroup(const std::string name, const std::string textureFilePath);
 
-	static uint32_t GetNumMaxInstance() { return ParticleGroup::kNumInstance; }
+	static uint32_t GetNumMaxInstance() { return ParticleGroup::kNumMaxInstance; }
 
 	void SetModel(const std::string filePath);
 
@@ -80,7 +81,7 @@ private:// メンバ関数
 	/// <summary>
 	/// パーティクルを生成
 	/// </summary>
-	Particle MakeNewParticle(Vector3& translate);
+	Particle MakeNewParticle(const Vector3& translate);
 
 private:// シングルトン設計
 

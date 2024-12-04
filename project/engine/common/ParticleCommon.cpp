@@ -137,7 +137,22 @@ void ParticleCommon::CreateRootSignature()
 	// PixelShaderからの出力を画面にどのように書き込むかを設定する項目
 
 	// BlendStateの設定(NormalBlend)
+	// すべての色要素を書き込む
 	blendDesc_.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+	// ブレンドを有効にするか無効にするかの指定
+	blendDesc_.RenderTarget[0].BlendEnable = TRUE;
+	// 加算合成 
+	// Result=SrcColor*SrcAlpha+DestColor
+	// ピクセルシェーダーを出力するRGB値に対して実行する操作を指定する
+	blendDesc_.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+	//SrcBlend操作とDestBlend操作を組み合わせる方法を定義する
+	blendDesc_.RenderTarget[0].BlendOp = D3D12_BLEND_OP_ADD;
+	blendDesc_.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+
+	// α値ブレンド設定。基本的に使わないのでこのまま
+	blendDesc_.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+	blendDesc_.RenderTarget[0].BlendOpAlpha = D3D12_BLEND_OP_ADD;
+	blendDesc_.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
 
 	//-------------------------------------
 	// RasterizerStateを作成
@@ -169,8 +184,8 @@ void ParticleCommon::CreateRootSignature()
 	// DepthStencilStateの設定
 	// Depthの機能を有効化する
 	depthStencilDesc_.DepthEnable = true;
-	// 書き込みします
-	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	// Depthの書き込みを行わない
+	depthStencilDesc_.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	// 比較関数はLessEqual。つまり、近ければ描画される
 	depthStencilDesc_.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
 }
