@@ -27,19 +27,14 @@ public:
 
 	void Draw();
 
-	/// <summary>
-	/// nameで指定した名前のパーティクルグループにパーティクルを発生させる
-	/// </summary>
+	// nameで指定した名前のパーティクルグループにパーティクルを発生させる
 	void Emit(const std::string name, const Vector3& translate, uint32_t count);
 
-	/// <summary>
-	/// パーティクルグループの生成
-	/// </summary>
+	// パーティクルグループの生成
 	void CreateParticleGroup(const std::string name, const std::string textureFilePath);
 
-	/// <summary>
-	/// パーティクルグループをリセット
-	/// </summary>
+
+	// パーティクルグループをリセット
 	void Reset();
 
 	static uint32_t GetNumMaxInstance() { return ParticleGroup::kNumMaxInstance; }
@@ -70,31 +65,21 @@ private:// メンバ変数
 
 private:// メンバ関数
 
-	/// <summary>
-	/// パーティクルを生成
-	/// </summary>
+	// パーティクルを生成
 	Particle MakeNewParticle(const Vector3& translate);
 
 private:// シングルトン設計
 
 	static ParticleManager* instance;
 
-	/// <summary>
-	/// コンストラクタ、デストラクタの隠蔽
-	/// </summary>
+	// コンストラクタ、デストラクタの隠蔽
 	ParticleManager() = default;
 	~ParticleManager() = default;
 
-	/// <summary>
-	/// コピーコンストラクタの封印
-	/// </summary>
-	/// <param name=""></param>
+	// コピーコンストラクタの封印
 	ParticleManager(ParticleManager&) = delete;
 
-	/// <summary>
-	/// コピー代入演算の封印
-	/// </summary>
-	/// <param name=""></param>
+	// コピー代入演算の封印
 	ParticleManager& operator=(ParticleManager&) = delete;
 
 };
