@@ -7,6 +7,7 @@ void Player::Initialize()
 
 void Player::Update()
 {
+	object_->SetTranslate(position_);
 	object_->Update();
 }
 
@@ -18,23 +19,19 @@ void Player::Draw()
 void Player::MoveRight()
 {
 	this->position_.x += this->speed_;
-	object_->SetTranslate(position_);
 }
 
 void Player::MoveLeft()
 {
 	this->position_.x -= this->speed_;
-	object_->SetTranslate(position_);
 }
 
 void Player::MoveForward()
 {
 	this->position_.z += this->speed_;
-	object_->SetTranslate(position_);
 }
 
 void Player::MoveBack()
 {
 	this->position_.z -= this->speed_;
-	object_->SetTranslate(position_);
 }

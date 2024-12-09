@@ -52,16 +52,17 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	particleEmitter_ = std::make_unique<ParticleEmitter>();
-	particleEmitter_->Initialize("Particle", {0.0f,0.0f,0.0f}, 5);
+	particleEmitter_->Initialize("Particle", player_->GetTranslate(), 5);
 
 }
 
 void GameScene::Finalize()
 {
 	ParticleManager::GetInstance()->Reset();
+
+	// 解放処理を入れないとメモリリークするため記述
+	// 原因が分かり次第削除
 	{
-		// 解放処理を入れないとメモリリークするため記述
-		// 原因が分かり次第削除
 		player_.reset();
 
 		playerObject_.reset();
@@ -82,7 +83,7 @@ void GameScene::Update()
 	}
 
 	//-------------------------------------
-	// コマンド系クラスの更新
+	// Commandクラスの更新
 	//-------------------------------------
 
 	// get Input
@@ -112,6 +113,7 @@ void GameScene::Update()
 	//-------------------------------------
 
 	ParticleManager::GetInstance()->SetTexture("Particle", textureFilePath_);
+	particleEmitter_->SetTranslate(player_->GetTranslate());
 	particleEmitter_->Update();
 
 }

@@ -18,7 +18,7 @@
 /// </summary>
 class GameScene : public BaseScene
 {
-public:
+public:// メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -44,7 +44,7 @@ public:
 	/// </summary>
 	void Draw() override;
 
-private:
+private:// メンバ変数
 	// モデル
 	std::unique_ptr<Object3d> playerObject_;
 

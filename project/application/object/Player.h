@@ -22,6 +22,8 @@ public:// メンバ関数
 	// 後
 	void MoveBack();
 
+	const Vector3& GetTranslate()const { return object_->GetTranslate(); }
+
 	void SetObject(Object3d* object) { this->object_ = object; }
 
 private:// メンバ変数
