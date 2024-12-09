@@ -115,7 +115,7 @@ private:
 
 	SpriteCommon* pSpriteCommon_ = nullptr;
 
-	Transform transform_ = {};
+	Transform transform_;
 	Transform uvTransform_ = {};
 
 	// バッファリソース

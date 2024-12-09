@@ -25,7 +25,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Object3dCommon* object3dCommon);
+	void Initialize(Camera* camera,std::string filePath);
 
 	/// <summary>
 	/// 更新
@@ -39,13 +39,15 @@ public:
 
 public:// ゲッター・セッター
 
-	const Vector3& GetScale()const { return transform_.scale; }
-	const Vector3& GetRotate()const { return transform_.rotate; }
-	const Vector3& GetTranslate()const { return transform_.translate; }
+	const Vector3& GetScale()const { return transform_.scale_; }
+	const Vector3& GetRotate()const { return transform_.rotate_; }
+	const Vector3& GetTranslate()const { return transform_.translate_; }
+	const Transform& GetTransform()const { return transform_; }
 
-	void SetScale(const Vector3& scale) { transform_.scale = scale; }
-	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
-	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+	void SetScale(const Vector3& scale) { transform_.scale_ = scale; }
+	void SetRotate(const Vector3& rotate) { transform_.rotate_ = rotate; }
+	void SetTranslate(const Vector3& translate) { transform_.translate_ = translate; }
+	void SetTransform(const Transform& transform) { transform_ = transform; }
 	void SetCamera(Camera* camera) { this->pCamera_ = camera; }
 
 	/// <summary>
@@ -61,7 +63,7 @@ private:// メンバ変数
 	Camera* pCamera_ = nullptr;
 
 	// Transform
-	Transform transform_ = {};
+	Transform transform_;
 	Matrix4x4 worldViewProjectionMatrix_ = {};
 
 	// バッファリソース
