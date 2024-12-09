@@ -23,11 +23,12 @@ void Sprite::Initialize(SpriteCommon* spriteCommon, std::string textureFilePath)
 	// Transform情報を作る
 	//-------------------------------------
 
-	transform_.scale = { size_.x,size_.y,1.0f };
-	transform_.rotate = { 0.0f,0.0f,rotation_ };
-	transform_.translate = { position_.x,position_.y,0.0f };
+	transform_.Initilaize();
+	transform_.scale_ = { size_.x,size_.y,1.0f };
+	transform_.rotate_ = { 0.0f,0.0f,rotation_ };
+	transform_.translate_ = { position_.x,position_.y,0.0f };
 
-	uvTransform_ = { {1.0f,1.0f,1.f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	uvTransform_.Initilaize();
 
 
 	//-------------------------------------
@@ -303,15 +304,15 @@ void Sprite::CreateTrasnformationMatrixData()
 
 void Sprite::CreateWVPMatrix()
 {
-	transform_.scale = { size_.x,size_.y,1.0f };
-	transform_.rotate = { 0.0f,0.0f,rotation_ };
-	transform_.translate = { position_.x,position_.y,0.0f };
+	transform_.scale_ = { size_.x,size_.y,1.0f };
+	transform_.rotate_ = { 0.0f,0.0f,rotation_ };
+	transform_.translate_ = { position_.x,position_.y,0.0f };
 
 	//-------------------------------------
 	// TransformからWorldMatrixを作る
 	//-------------------------------------
 
-	Matrix4x4 worldMatrix = GameMath::MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 worldMatrix = GameMath::MakeAffineMatrix(transform_.scale_, transform_.rotate_, transform_.translate_);
 
 	//-------------------------------------
 	// ViewMatrixを作って単位行列を代入

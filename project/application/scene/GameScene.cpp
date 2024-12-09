@@ -11,22 +11,6 @@ void GameScene::Initialize()
 {
 
 	//-------------------------------------
-	// テクスチャファイルの読み込み
-	//-------------------------------------
-
-	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
-	TextureManager::GetInstance()->LoadTexture("resource/monsterBall.png");
-	TextureManager::GetInstance()->LoadTexture("resource/eto_tora_family.png");
-	TextureManager::GetInstance()->LoadTexture("resource/circle.png");
-	
-	//-------------------------------------
-	// 3dモデルの読み込み
-	//-------------------------------------
-	
-	ModelManager::GetInstance()->LoadModel("plane.obj");
-	ModelManager::GetInstance()->LoadModel("axis.obj");
-
-	//-------------------------------------
 	// カメラの初期化
 	//-------------------------------------
 

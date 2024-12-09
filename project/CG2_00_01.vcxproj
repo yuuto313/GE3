@@ -108,6 +108,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\audio\Audio.cpp" />
     <ClCompile Include="engine\io\D3DResourceLeakChecker.cpp" />
     <ClCompile Include="engine\base\DirectXCommon.cpp" />
+    <ClCompile Include="engine\struct\geometory\Transform.cpp" />
     <ClCompile Include="externals\imgui\imgui.cpp" />
     <ClCompile Include="externals\imgui\imgui_demo.cpp" />
     <ClCompile Include="externals\imgui\imgui_draw.cpp" />
@@ -141,6 +142,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\manager\ParticleManager.cpp" />
     <ClCompile Include="engine\common\ParticleCommon.cpp" />
     <ClCompile Include="engine\3d\ParticleEmitter.cpp" />
+    <ClCompile Include="application\object\Player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\struct\DirectionalLight.h" />
@@ -195,6 +197,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\struct\geometory\Matrix.h" />
     <ClInclude Include="engine\struct\ParticleSystem.h" />
     <ClInclude Include="engine\struct\Field.h" />
+    <ClInclude Include="application\object\Player.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

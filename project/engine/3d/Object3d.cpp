@@ -15,7 +15,7 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 	// Transform情報を作る
 	//-------------------------------------
 
-	transform_ = { {1.0f,1.0f,1.f},{0.0f,0.0f,0.0f},{0.0f,0.0f,0.0f} };
+	transform_.Initilaize();
 
 	//-------------------------------------
 	// デフォルトカメラをセットする
@@ -127,7 +127,7 @@ void Object3d::CreateWVPMatrix()
 	// TransformからWorldMatrixを作る
 	//-------------------------------------
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale, transform_.rotate, transform_.translate);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale_, transform_.rotate_, transform_.translate_);
 
 	//-------------------------------------
 	// worldViewProjectionMatrixを作成
