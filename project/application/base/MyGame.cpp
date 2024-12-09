@@ -1,5 +1,6 @@
 #include "MyGame.h"
 #include "SceneFactory.h"
+#include "TextureManager.h"
 
 void MyGame::Initialize()
 {
@@ -10,6 +11,23 @@ void MyGame::Initialize()
 	//-------------------------------------
 
 	OYFramework::Initialize();
+
+	//-------------------------------------
+	// テクスチャファイルの読み込み
+	//-------------------------------------
+
+	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
+	TextureManager::GetInstance()->LoadTexture("resource/circle.png");
+	TextureManager::GetInstance()->LoadTexture("resource/cube.jpg");
+	TextureManager::GetInstance()->LoadTexture("resource/sky.jpg");
+
+	//-------------------------------------
+	// 3dモデルの読み込み
+	//-------------------------------------
+
+	ModelManager::GetInstance()->LoadModel("plane.obj");
+	ModelManager::GetInstance()->LoadModel("skydome.obj");
+	ModelManager::GetInstance()->LoadModel("cube.obj");
 
 	//-------------------------------------
 	// キーボード入力の初期化

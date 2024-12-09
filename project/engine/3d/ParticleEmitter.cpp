@@ -11,9 +11,7 @@ void ParticleEmitter::Initialize(const std::string name, const Vector3& translat
 	count_ = count;
 
 	// Emitterの情報を初期化
-	transform_.scale = { 1.0f,1.0f,1.0f };
-	transform_.rotate = { 0.0f,0.0f,0.0f };
-	transform_.translate = translate;
+	transform_.translate_ = translate;
 
 	// 0.5秒ごとに発生
 	frequency_ = 0.5f;
@@ -33,13 +31,13 @@ void ParticleEmitter::Update()
 	// 発生頻度より大きいなら発生
 	if (frequency_ <= frequencyTime_) {
 		// 発生処理
-		particleManager_->Emit(groupName_, transform_.translate, count_);
+		particleManager_->Emit(groupName_, transform_.translate_, count_);
 		// 余計に過ぎた時間も加味して頻度計算する
 		frequencyTime_ -= frequency_;
 	}
 
 	ImGui::Begin("Emitter");
-	ImGui::DragFloat3("EmitterTranslate", &transform_.translate.x, 0.01f, -100.0f, 100.0f);
+	ImGui::DragFloat3("EmitterTranslate", &transform_.translate_.x, 0.01f, -100.0f, 100.0f);
 	ImGui::End();
 
 }
@@ -56,5 +54,5 @@ void ParticleEmitter::Draw()
 void ParticleEmitter::Emit()
 {
 	// パーティクルマネージャから呼び出すだけ
-	particleManager_->Emit(groupName_, transform_.translate, count_);
+	particleManager_->Emit(groupName_, transform_.translate_, count_);
 }
