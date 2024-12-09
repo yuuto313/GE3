@@ -7,7 +7,7 @@ class Player
 {
 public:// メンバ関数
 
-	void Initialize();
+	void Initialize(Object3d* object);
 
 	void Update();
 
@@ -23,8 +23,6 @@ public:// メンバ関数
 	void MoveBack();
 
 	const Vector3& GetTranslate()const { return object_->GetTranslate(); }
-
-	void SetObject(Object3d* object) { this->object_ = object; }
 
 private:// メンバ変数
 

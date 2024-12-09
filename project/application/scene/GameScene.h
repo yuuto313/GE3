@@ -9,6 +9,8 @@
 
 #include "InputHandler.h"
 #include "ICommand.h"
+
+#include "Skydome.h"
 #include "Player.h"
 
 #include <memory>
@@ -47,10 +49,13 @@ public:// メンバ関数
 private:// メンバ変数
 	// モデル
 	std::unique_ptr<Object3d> playerObject_;
+	std::unique_ptr<Object3d> skydomeObject_;
+
 
 	// オブジェクト
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
+	std::unique_ptr<Skydome> skydome_;
 	std::unique_ptr<Player> player_;
 
 	// コマンド

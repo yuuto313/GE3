@@ -1,7 +1,8 @@
 #include "Player.h"
 
-void Player::Initialize()
+void Player::Initialize(Object3d* object)
 {
+	this->object_ = object;
 	position_ = object_->GetTranslate();
 }
 

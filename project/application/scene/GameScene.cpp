@@ -21,22 +21,32 @@ void GameScene::Initialize()
 
 	camera_ = std::make_unique<Camera>();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
-	camera_->SetTranslate({ 0.0f,4.0f,-10.0f });
+	camera_->SetTranslate({ 0.0f,10.0f,-30.0f });
 
 	//-------------------------------------
 	// 3dオブジェクト生成
 	//-------------------------------------
 
+	skydomeObject_ = std::make_unique<Object3d>();
+	skydomeObject_->Initialize(camera_.get(), "skydome.obj");
+
 	playerObject_ = std::make_unique<Object3d>();
 	playerObject_->Initialize(camera_.get(), "cube.obj");
 
 	//-------------------------------------
-	// プレイヤーの初期化
+	// 天球の生成
+	//-------------------------------------
+
+	skydome_ = std::make_unique<Skydome>();
+	skydome_->Initialize(skydomeObject_.get());
+
+
+	//-------------------------------------
+	// プレイヤーの生成
 	//-------------------------------------
 
 	player_ = std::make_unique<Player>();
-	player_->SetObject(playerObject_.get());
-	player_->Initialize();
+	player_->Initialize(playerObject_.get());
 
 	//-------------------------------------
 	// パーティクルマネージャ生成
@@ -60,12 +70,16 @@ void GameScene::Finalize()
 {
 	ParticleManager::GetInstance()->Reset();
 
-	// 解放処理を入れないとメモリリークするため記述
+	// 明示的に解放処理を入れないとメモリリークするため記述
 	// 原因が分かり次第削除
 	{
 		player_.reset();
 
+		skydome_.reset();
+
 		playerObject_.reset();
+	
+		skydomeObject_.reset();
 	}
 
 }
@@ -94,13 +108,18 @@ void GameScene::Update()
 		iCommand_->Exec(*player_.get());
 	}
 
-
 	//-------------------------------------
 	// カメラの更新
 	//-------------------------------------
 
 	// 3dオブジェクトの更新より前に行う
 	camera_->Update();
+
+	//-------------------------------------
+	// 天球の更新
+	//-------------------------------------
+
+	skydome_->Update();
 
 	//-------------------------------------
 	// プレイヤーの更新
@@ -140,6 +159,8 @@ void GameScene::ImGui()
 
 void GameScene::Draw()
 {
+	skydome_->Draw();
+
 	player_->Draw();
 
 	particleEmitter_->Draw();
