@@ -20,8 +20,8 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	camera_ = std::make_unique<Camera>();
-	camera_->SetRotate({ 0.3f,0.0f,0.0f });
-	camera_->SetTranslate({ 0.0f,10.0f,-30.0f });
+	camera_->SetRotate({ 0.1f,0.0f,0.0f });
+	camera_->SetTranslate({ 0.0f,2.5f,-17.6f });
 
 	//-------------------------------------
 	// 3dオブジェクト生成
@@ -62,6 +62,7 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	particleEmitter_ = std::make_unique<ParticleEmitter>();
+	textureFilePath_ = "resource/circle.png";
 	particleEmitter_->Initialize("Particle", player_->GetTranslate(), 5);
 
 }
@@ -112,7 +113,7 @@ void GameScene::Update()
 	// カメラの更新
 	//-------------------------------------
 
-	// 3dオブジェクトの更新より前に行う
+	// ※3dオブジェクトの更新より前に行う※
 	camera_->Update();
 
 	//-------------------------------------
@@ -139,22 +140,8 @@ void GameScene::Update()
 
 void GameScene::ImGui()
 {
-	ImGui::Begin("Particle");
-
-	// チェックボックスでテクスチャを変更
-	ImGui::Checkbox("Change Texture", &changeTexture_);
-
-	// テクスチャを変更する
-	if (changeTexture_) {
-		textureFilePath_ = "resource/circle.png";  // 切り替えるテクスチャのパス
-	} else {
-		textureFilePath_ = "resource/uvChecker.png";
-	}
-
-	ImGui::End();
-
 	camera_->ImGui();
-
+	player_->ImGui();
 }
 
 void GameScene::Draw()

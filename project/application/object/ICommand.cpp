@@ -16,10 +16,10 @@ void MoveLeftCommand::Exec(Player& player)
 
 void MoveForwardCommand::Exec(Player& player)
 {
-	player.MoveForward();
+	player.MoveUp();
 }
 
 void MoveBackCommand::Exec(Player& player)
 {
-	player.MoveBack();
+	player.MoveDown();
 }

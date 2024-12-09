@@ -13,14 +13,19 @@ public:// メンバ関数
 
 	void Draw();
 
+	void ImGui();
+
+	// 位置を制限する
+	void ClampPosition();
+
 	// 右
 	void MoveRight();
 	// 左
 	void MoveLeft();
-	// 前
-	void MoveForward();
-	// 後
-	void MoveBack();
+	// 上
+	void MoveUp();
+	// 下
+	void MoveDown();
 
 	const Vector3& GetTranslate()const { return object_->GetTranslate(); }
 
@@ -29,7 +34,7 @@ private:// メンバ変数
 	Object3d* object_ = nullptr;
 
 	float speed_ = 0.3f;
-	Vector3 position_ = {};
+	Transform transform_ = {};
 
 };
 
