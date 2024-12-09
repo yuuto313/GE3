@@ -63,7 +63,7 @@
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\struct;$(ProjectDir)engine\struct\geometory;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\struct;$(ProjectDir)engine\struct\geometory;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;$(ProjectDir)application\object;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -87,7 +87,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\struct;$(ProjectDir)engine\struct\geometory;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)engine\2d;$(ProjectDir)engine\3d;$(ProjectDir)engine\audio;$(ProjectDir)engine\base;$(ProjectDir)engine\struct;$(ProjectDir)engine\struct\geometory;$(ProjectDir)engine\common;$(ProjectDir)engine\io;$(ProjectDir)engine\manager;$(ProjectDir)engine\math;$(ProjectDir)engine\scene;$(ProjectDir)engine\input;$(ProjectDir)application\scene;$(ProjectDir)application\scene\base;$(ProjectDir)application\scene\factory;$(ProjectDir)application\scene\manager;$(ProjectDir)application\base;$(ProjectDir)application\object;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>MinSpace</Optimization>
     </ClCompile>
     <Link>
@@ -122,6 +122,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\base\MyGame.cpp" />
     <ClCompile Include="application\base\OYFramework.cpp" />
     <ClCompile Include="application\scene\GameScene.cpp" />
+    <ClCompile Include="application\object\ICommand.cpp" />
+    <ClCompile Include="application\object\InputHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\math\GameMath.cpp" />
     <ClCompile Include="engine\io\ResourceObject.cpp" />
@@ -198,6 +200,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\struct\ParticleSystem.h" />
     <ClInclude Include="engine\struct\Field.h" />
     <ClInclude Include="application\object\Player.h" />
+    <ClInclude Include="application\object\ICommand.h" />
+    <ClInclude Include="application\object\InputHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

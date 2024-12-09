@@ -5,11 +5,9 @@
 #include <cassert>
 #include <fstream>
 
-void Object3d::Initialize(Object3dCommon* object3dCommon)
+void Object3d::Initialize(Camera* camera, std::string filePath)
 {
-
-	// 引数で受けっとってメンバ変数に記録
-	this->pObject3dCommon_ = object3dCommon;
+	this->pObject3dCommon_ = Object3dCommon::GetInstance();
 
 	//-------------------------------------
 	// Transform情報を作る
@@ -34,6 +32,18 @@ void Object3d::Initialize(Object3dCommon* object3dCommon)
 	//-------------------------------------
 
 	CreateDirectionalLightData();
+
+	//-------------------------------------
+	// カメラを設定
+	//-------------------------------------
+
+	SetCamera(camera);
+
+	//-------------------------------------
+	// モデルの設定
+	//-------------------------------------
+
+	SetModel(filePath);
 
 }
 

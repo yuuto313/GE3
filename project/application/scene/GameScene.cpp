@@ -9,6 +9,11 @@
 
 void GameScene::Initialize()
 {
+	//-------------------------------------
+	// InputHandlerクラスの生成
+	//-------------------------------------
+
+	inputHandler_ = std::make_unique<InputHandler>();
 
 	//-------------------------------------
 	// カメラの初期化
@@ -17,6 +22,21 @@ void GameScene::Initialize()
 	camera_ = std::make_unique<Camera>();
 	camera_->SetRotate({ 0.3f,0.0f,0.0f });
 	camera_->SetTranslate({ 0.0f,4.0f,-10.0f });
+
+	//-------------------------------------
+	// 3dオブジェクト生成
+	//-------------------------------------
+
+	playerObject_ = std::make_unique<Object3d>();
+	playerObject_->Initialize(camera_.get(), "cube.obj");
+
+	//-------------------------------------
+	// プレイヤーの初期化
+	//-------------------------------------
+
+	player_ = std::make_unique<Player>();
+	player_->SetObject(playerObject_.get());
+	player_->Initialize();
 
 	//-------------------------------------
 	// パーティクルマネージャ生成
@@ -39,6 +59,14 @@ void GameScene::Initialize()
 void GameScene::Finalize()
 {
 	ParticleManager::GetInstance()->Reset();
+	{
+		// 解放処理を入れないとメモリリークするため記述
+		// 原因が分かり次第削除
+		player_.reset();
+
+		playerObject_.reset();
+	}
+
 }
 
 void GameScene::Update()
@@ -54,12 +82,30 @@ void GameScene::Update()
 	}
 
 	//-------------------------------------
+	// コマンド系クラスの更新
+	//-------------------------------------
+
+	// get Input
+	iCommand_ = inputHandler_->HandleInput();
+
+	// set Command
+	if (this->iCommand_) {
+		iCommand_->Exec(*player_.get());
+	}
+
+
+	//-------------------------------------
 	// カメラの更新
 	//-------------------------------------
 
 	// 3dオブジェクトの更新より前に行う
 	camera_->Update();
 
+	//-------------------------------------
+	// プレイヤーの更新
+	//-------------------------------------
+
+	player_->Update();
 
 	//-------------------------------------
 	// パーティクルエミッターの更新
@@ -86,10 +132,14 @@ void GameScene::ImGui()
 
 	ImGui::End();
 
+	camera_->ImGui();
+
 }
 
 void GameScene::Draw()
 {
+	player_->Draw();
+
 	particleEmitter_->Draw();
 }
 

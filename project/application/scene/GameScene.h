@@ -7,6 +7,12 @@
 #include "Input.h"
 #include "ParticleEmitter.h"
 
+#include "InputHandler.h"
+#include "ICommand.h"
+#include "Player.h"
+
+#include <memory>
+
 /// <summary>
 /// ゲームプレイシーン
 /// </summary>
@@ -39,8 +45,17 @@ public:
 	void Draw() override;
 
 private:
+	// モデル
+	std::unique_ptr<Object3d> playerObject_;
+
+	// オブジェクト
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
+	std::unique_ptr<Player> player_;
+
+	// コマンド
+	std::unique_ptr<InputHandler> inputHandler_;
+	std::unique_ptr<ICommand> iCommand_;
 
 	// 仮
 	bool changeTexture_ = false;

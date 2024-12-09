@@ -18,12 +18,15 @@ void MyGame::Initialize()
 
 	TextureManager::GetInstance()->LoadTexture("resource/uvChecker.png");
 	TextureManager::GetInstance()->LoadTexture("resource/circle.png");
+	TextureManager::GetInstance()->LoadTexture("resource/cube.jpg");
 
 	//-------------------------------------
 	// 3dモデルの読み込み
 	//-------------------------------------
 
 	ModelManager::GetInstance()->LoadModel("plane.obj");
+	ModelManager::GetInstance()->LoadModel("axis.obj");
+	ModelManager::GetInstance()->LoadModel("cube.obj");
 
 	//-------------------------------------
 	// キーボード入力の初期化

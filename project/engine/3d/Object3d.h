@@ -25,7 +25,7 @@ public:
 	/// <summary>
 	/// 初期化
 	/// </summary>
-	void Initialize(Object3dCommon* object3dCommon);
+	void Initialize(Camera* camera,std::string filePath);
 
 	/// <summary>
 	/// 更新
