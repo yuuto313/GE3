@@ -17,6 +17,8 @@ public:
 
 	void Draw();
 
+	void SetTranslate(const Vector3& translate) { transform_.translate_ = translate; }
+
 private:
 
 	ParticleManager* particleManager_ = nullptr;

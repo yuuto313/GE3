@@ -10,7 +10,7 @@
 /// </summary>
 class TitleScene : public BaseScene
 {
-public:
+public:// メンバ関数
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -36,7 +36,7 @@ public:
 	/// </summary>
 	void Draw() override;
 
-private:
+private:// メンバ変数
 	std::unique_ptr<Sprite> sprite_;
 	Vector2 position_;
 };

@@ -7,12 +7,21 @@
 #include "Input.h"
 #include "ParticleEmitter.h"
 
+#include "InputHandler.h"
+#include "ICommand.h"
+
+#include "Skydome.h"
+#include "Player.h"
+
+#include <memory>
+
 /// <summary>
 /// ゲームプレイシーン
 /// </summary>
 class GameScene : public BaseScene
 {
-public:
+public:// メンバ関数
+
 	/// <summary>
 	/// 初期化
 	/// </summary>
@@ -38,9 +47,21 @@ public:
 	/// </summary>
 	void Draw() override;
 
-private:
+private:// メンバ変数
+	// モデル
+	std::unique_ptr<Object3d> playerObject_;
+	std::unique_ptr<Object3d> skydomeObject_;
+
+
+	// オブジェクト
 	std::unique_ptr<Camera> camera_;
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
+	std::unique_ptr<Skydome> skydome_;
+	std::unique_ptr<Player> player_;
+
+	// コマンド
+	std::unique_ptr<InputHandler> inputHandler_;
+	std::unique_ptr<ICommand> iCommand_;
 
 	// 仮
 	bool changeTexture_ = false;

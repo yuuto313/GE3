@@ -87,18 +87,18 @@ void ParticleManager::Update()
 				particleIterator = particleGroupIterator->second.particles.erase(particleIterator);
 			} else {
 				// 場の影響を計算
-				if (IsCollision(accelerationField_.area, particleIterator->transform.translate)) {
+				if (IsCollision(accelerationField_.area, particleIterator->transform.translate_)) {
 					particleIterator->velocity += accelerationField_.acceleration * deltaTime;
 				}
 				// 移動処理
-				particleIterator->transform.translate += particleIterator->velocity * deltaTime;
+				particleIterator->transform.translate_ += particleIterator->velocity * deltaTime;
 				// 経過時間を加算
 				particleIterator->currentTime += deltaTime;
 				float alpha = 1.0f - (particleIterator->currentTime / particleIterator->lifeTime);
 				if (particleGroupIterator->second.kNumInstance <= particleGroupIterator->second.kNumMaxInstance) {
 					// ワールド行列を計算
-					Matrix4x4 scaleMatrix = MakeScaleMatrix(particleIterator->transform.scale);
-					Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->transform.translate);
+					Matrix4x4 scaleMatrix = MakeScaleMatrix(particleIterator->transform.scale_);
+					Matrix4x4 translateMatrix = MakeTranslateMatrix(particleIterator->transform.translate_);
 					Matrix4x4 worldMatrix = Multiply(scaleMatrix, Multiply(billboardMatrix, translateMatrix));
 
 					// ワールドビュープロジェクション行列を合成
@@ -230,11 +230,11 @@ Particle ParticleManager::MakeNewParticle(const Vector3& translate)
 
 	// パーティクルを1つ生成
 	Particle particle;
-	particle.transform.scale = { 1.0f,1.0f,1.0f };
-	particle.transform.rotate = { 0.0f,0.0f,0.0f };
+	particle.transform.scale_ = { 1.0f,1.0f,1.0f };
+	particle.transform.rotate_ = { 0.0f,0.0f,0.0f };
 	// 発生場所
 	Vector3 randomTranslate = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
-	particle.transform.translate = translate + randomTranslate;
+	particle.transform.translate_ = translate + randomTranslate;
 	particle.velocity = { distribution(randomEngine_),distribution(randomEngine_),distribution(randomEngine_) };
 
 	// 色を変更

@@ -25,11 +25,11 @@ public:
 	const Matrix4x4& GetViewMatrix()const { return viewMatrix_; }
 	const Matrix4x4& GetProjectionMatrix()const { return projectionMatrix_; }
 	const Matrix4x4& GetViewProjectionMatrix()const { return viewProjectionMatrix_; }
-	const Vector3& GetRotate()const { return transform_.rotate; }
-	const Vector3& GetTranslate()const { return transform_.translate; }
+	const Vector3& GetRotate()const { return transform_.rotate_; }
+	const Vector3& GetTranslate()const { return transform_.translate_; }
 
-	void SetRotate(const Vector3& rotate) { transform_.rotate = rotate; }
-	void SetTranslate(const Vector3& translate) { transform_.translate = translate; }
+	void SetRotate(const Vector3& rotate) { transform_.rotate_ = rotate; }
+	void SetTranslate(const Vector3& translate) { transform_.translate_ = translate; }
 	void SetFovY(float fovY) { fovY_ = fovY; }
 	void SetAspectRatio(float aspectRation) { aspectRatio_ = aspectRation; }
 	void SetNearClip(float nearClip) { nearClip_ = nearClip; }
