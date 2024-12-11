@@ -8,7 +8,7 @@ class PlayerBullet
 {
 public:// メンバ関数
 
-	void Initialize(std::unique_ptr<Object3d> object,const Vector3& translate);
+	void Initialize(std::unique_ptr<Object3d> object,const Vector3& translate,const Vector3& velocity);
 
 	void Update();
 

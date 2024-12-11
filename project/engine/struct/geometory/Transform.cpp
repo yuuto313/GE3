@@ -13,6 +13,7 @@ void Transform::Initilaize()
 	this->scale_ = { 1.0f,1.0f,1.0f };
 	this->rotate_ = { 0.0f,0.0f,0.0f };
 	this->translate_ = { 0.0f,0.0f,0.0f };
+	UpdateMatrix();
 }
 
 void Transform::UpdateMatrix()

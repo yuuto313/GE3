@@ -1,13 +1,13 @@
 #include "PlayerBullet.h"
 #include <assert.h>
 
-void PlayerBullet::Initialize(std::unique_ptr<Object3d> object,const Vector3& translate)
+void PlayerBullet::Initialize(std::unique_ptr<Object3d> object,const Vector3& translate,const Vector3& velocity)
 {
 	this->object_ = std::move(object);
 	
 	translate_ = translate;
 
-	velocity_ = { 0.0f,0.0,0.5f };
+	velocity_ = velocity;
 }
 
 void PlayerBullet::Update()
