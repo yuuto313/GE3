@@ -122,8 +122,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\base\MyGame.cpp" />
     <ClCompile Include="application\base\OYFramework.cpp" />
     <ClCompile Include="application\scene\GameScene.cpp" />
-    <ClCompile Include="application\object\ICommand.cpp" />
-    <ClCompile Include="application\object\InputHandler.cpp" />
+    <ClCompile Include="application\ICommand.cpp" />
+    <ClCompile Include="application\InputHandler.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\math\GameMath.cpp" />
     <ClCompile Include="engine\io\ResourceObject.cpp" />
@@ -146,7 +146,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\3d\ParticleEmitter.cpp" />
     <ClCompile Include="application\object\Player.cpp" />
     <ClCompile Include="application\object\Skydome.cpp" />
-    <ClCompile Include="PlayerBullet.cpp" />
+    <ClCompile Include="application\object\PlayerBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\struct\DirectionalLight.h" />
@@ -202,10 +202,10 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="engine\struct\ParticleSystem.h" />
     <ClInclude Include="engine\struct\Field.h" />
     <ClInclude Include="application\object\Player.h" />
-    <ClInclude Include="application\object\ICommand.h" />
-    <ClInclude Include="application\object\InputHandler.h" />
+    <ClInclude Include="application\ICommand.h" />
+    <ClInclude Include="application\InputHandler.h" />
     <ClInclude Include="application\object\Skydome.h" />
-    <ClInclude Include="PlayerBullet.h" />
+    <ClInclude Include="application\object\PlayerBullet.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />
