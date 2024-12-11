@@ -49,8 +49,8 @@ public:// メンバ関数
 
 private:// メンバ変数
 	// モデル
-	std::unique_ptr<Object3d> playerObject_;
-	std::unique_ptr<Object3d> skydomeObject_;
+	std::vector<std::unique_ptr<Object3d>> playerObjects_;
+	std::unique_ptr<Object3d> skydomeObj_;
 
 
 	// オブジェクト
@@ -61,7 +61,7 @@ private:// メンバ変数
 
 	// コマンド
 	std::unique_ptr<InputHandler> inputHandler_;
-	std::unique_ptr<ICommand> iCommand_;
+	std::vector<std::unique_ptr<ICommand>> commands_;
 
 	// 仮
 	bool changeTexture_ = false;

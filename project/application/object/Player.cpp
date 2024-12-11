@@ -1,39 +1,51 @@
 #include "Player.h"
 #include "WinApp.h"
 #include "ImGuiManager.h"
+#include <assert.h>
 
-void Player::Initialize(Object3d* object)
+void Player::Initialize(std::vector<std::unique_ptr<Object3d>>& objects)
 {
-	this->object_ = object;
+	this->objects_ = std::move(objects);
 
 	transform_.Initilaize();
-	transform_ = this->object_->GetTransform();
-
+	transform_ = objects_[0]->GetTransform();
 	// モデルのスケールを設定
 	transform_.scale_ = { 0.7f,0.7f,0.7f };
-	this->object_->SetScale(transform_.scale_);
 }
 
 void Player::Update()
 {
+	// デスフラグの立った弾を削除
+	bullets_.remove_if([](const std::unique_ptr<PlayerBullet>& bullet) {return bullet->IsDead(); });
+
+	// 弾の更新処理
+	for (const auto& bullet : bullets_) {
+ 		bullet->Update();		
+	}
+
 	// 画面内制限
 	ClampPosition();
-
-	// モデル更新
-	object_->SetTranslate(transform_.translate_);
-	object_->Update();
+	
+	objects_[0]->SetTransform(transform_);
+	objects_[0]->Update();
 }
 
 void Player::Draw()
 {
+	// 弾の描画処理
+	for (const auto& bullet : bullets_) {
+		bullet->Draw();
+	}
+
 	// モデル描画
-	object_->Draw();
+	objects_[0]->Draw();
 }
 
 void Player::ImGui()
 {
 	ImGui::Begin("Player");
 	ImGui::SliderFloat3("translate", &transform_.translate_.x, -10.0f, 10.0f);
+	ImGui::Text("bullets_count : %d", bullets_.size());
 	ImGui::End();
 }
 
@@ -59,6 +71,17 @@ void Player::ClampPosition()
 		transform_.translate_.y += speed_;
 	}
 
+}
+
+void Player::Attack()
+{
+	std::unique_ptr<Object3d> object = std::make_unique<Object3d>();
+	object->Initialize(objects_[1]->GetCamera(), objects_[1]->GetModel());
+
+	// 弾を生成
+	std::unique_ptr<PlayerBullet> bullet = std::make_unique<PlayerBullet>();
+	bullet->Initialize(std::move(object), this->transform_.translate_);
+	bullets_.push_back(std::move(bullet));
 }
 
 void Player::MoveRight()
