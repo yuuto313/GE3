@@ -145,7 +145,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="engine\common\ParticleCommon.cpp" />
     <ClCompile Include="engine\3d\ParticleEmitter.cpp" />
     <ClCompile Include="application\object\Player.cpp" />
-    <ClCompile Include="Skydome.cpp" />
+    <ClCompile Include="application\object\Skydome.cpp" />
+    <ClCompile Include="PlayerBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="engine\struct\DirectionalLight.h" />
@@ -203,7 +204,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\object\Player.h" />
     <ClInclude Include="application\object\ICommand.h" />
     <ClInclude Include="application\object\InputHandler.h" />
-    <ClInclude Include="Skydome.h" />
+    <ClInclude Include="application\object\Skydome.h" />
+    <ClInclude Include="PlayerBullet.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

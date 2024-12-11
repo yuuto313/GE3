@@ -47,17 +47,13 @@ void Object3d::Initialize(Camera* camera, std::string filePath)
 
 }
 
-void Object3d::Update()
+void Object3d::Draw(const Transform& transform)
 {
 	//-------------------------------------
 	// Transform情報を作る
 	//-------------------------------------
 
-	CreateWVPMatrix();
-}
-
-void Object3d::Draw()
-{
+	CreateWVPMatrix(transform);
 
 	//-------------------------------------
 	// 座標変換行列の場所を設定
@@ -131,13 +127,16 @@ void Object3d::CreateDirectionalLightData()
 	directionalLightData_->intensity = 1.0f;
 }
 
-void Object3d::CreateWVPMatrix()
+void Object3d::CreateWVPMatrix(const Transform& transform)
 {
+	// 引数からメンバ変数に記録
+	transform_ = transform;
+
 	//-------------------------------------
-	// TransformからWorldMatrixを作る
+	// Transform.matWorldの情報を受け取る
 	//-------------------------------------
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale_, transform_.rotate_, transform_.translate_);
+	Matrix4x4 worldMatrix = transform_.matWorld_;
 
 	//-------------------------------------
 	// worldViewProjectionMatrixを作成

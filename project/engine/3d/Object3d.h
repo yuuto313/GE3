@@ -28,14 +28,9 @@ public:
 	void Initialize(Camera* camera,std::string filePath);
 
 	/// <summary>
-	/// 更新
-	/// </summary>
-	void Update();
-
-	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw();
+	void Draw(const Transform& transform);
 
 public:// ゲッター・セッター
 
@@ -90,7 +85,7 @@ private:// メンバ関数
 	/// <summary>
 	/// WVP行列を作成する
 	/// </summary>
-	void CreateWVPMatrix();
+	void CreateWVPMatrix(const Transform& transform);
 
 };
 

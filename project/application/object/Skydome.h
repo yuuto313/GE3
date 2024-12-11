@@ -1,5 +1,6 @@
 #pragma once
 #include "Object3d.h"
+#include "Transform.h"
 
 class Skydome
 {
@@ -14,6 +15,8 @@ public:// メンバ関数
 private:// メンバ変数
 
 	Object3d* object_ = nullptr;
+	Transform transform_ = {};
+
 
 };
 
