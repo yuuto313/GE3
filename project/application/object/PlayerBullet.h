@@ -1,6 +1,5 @@
 #pragma once
 #include "Object3d.h"
-#include "Transform.h"
 
 /// <summary>
 /// 自機弾
@@ -9,7 +8,7 @@ class PlayerBullet
 {
 public:// メンバ関数
 
-	void Initialize(Object3d* object,const Vector3& translate);
+	void Initialize(std::unique_ptr<Object3d> object,const Vector3& translate);
 
 	void Update();
 
@@ -20,8 +19,9 @@ public:// メンバ関数
 
 private:// メンバ変数
 
-	Object3d* pObject_ = nullptr;
-	Transform transform_ = {};
+	std::unique_ptr<Object3d> object_;
+
+	Vector3 translate_ = {};
 
 	// 速度
 	Vector3 velocity_ = {};

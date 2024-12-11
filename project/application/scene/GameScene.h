@@ -49,8 +49,7 @@ public:// メンバ関数
 
 private:// メンバ変数
 	// モデル
-	std::unique_ptr<Object3d> playerObj_;
-	std::unique_ptr<Object3d> playerBulletObj_;
+	std::vector<std::unique_ptr<Object3d>> playerObjects_;
 	std::unique_ptr<Object3d> skydomeObj_;
 
 

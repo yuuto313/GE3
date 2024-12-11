@@ -27,10 +27,17 @@ public:
 	/// </summary>
 	void Initialize(Camera* camera,std::string filePath);
 
+	void Initialize(Camera* camera, Model* model);
+
+	/// <summary>
+	/// 更新
+	/// </summary>
+	void Update();
+
 	/// <summary>
 	/// 描画
 	/// </summary>
-	void Draw(const Transform& transform);
+	void Draw();
 
 public:// ゲッター・セッター
 
@@ -38,6 +45,8 @@ public:// ゲッター・セッター
 	const Vector3& GetRotate()const { return transform_.rotate_; }
 	const Vector3& GetTranslate()const { return transform_.translate_; }
 	const Transform& GetTransform()const { return transform_; }
+	Camera* GetCamera()const { return pCamera_; }
+	Model* GetModel() const { return pModel_; }
 
 	void SetScale(const Vector3& scale) { transform_.scale_ = scale; }
 	void SetRotate(const Vector3& rotate) { transform_.rotate_ = rotate; }
@@ -50,6 +59,8 @@ public:// ゲッター・セッター
 	/// </summary>
 	/// <param name="filePath"></param>
 	void SetModel(const std::string& filePath);
+
+	void SetModel(Model* model) { this->pModel_ = model; }
 
 private:// メンバ変数
 
@@ -85,7 +96,7 @@ private:// メンバ関数
 	/// <summary>
 	/// WVP行列を作成する
 	/// </summary>
-	void CreateWVPMatrix(const Transform& transform);
+	void CreateWVPMatrix();
 
 };
 

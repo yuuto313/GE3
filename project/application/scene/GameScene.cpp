@@ -30,13 +30,13 @@ void GameScene::Initialize()
 	skydomeObj_ = std::make_unique<Object3d>();
 	skydomeObj_->Initialize(camera_.get(), "skydome.obj");
 
-	playerObj_ = std::make_unique<Object3d>();
-	playerObj_->Initialize(camera_.get(), "cube.obj");
+	// 必要なサイズにリサイズ
+	playerObjects_.resize(2);
+	playerObjects_[0] = std::make_unique<Object3d>();
+	playerObjects_[0]->Initialize(camera_.get(), "cube.obj");
 
-	playerBulletObj_ = std::make_unique<Object3d>();
-	playerBulletObj_->Initialize(camera_.get(), "cube.obj");
-
-	std::vector<Object3d*> playerObjects = { playerObj_.get(),playerBulletObj_.get() };
+	playerObjects_[1] = std::make_unique<Object3d>();
+	playerObjects_[1]->Initialize(camera_.get(), "cube.obj");
 
 	//-------------------------------------
 	// 天球の生成
@@ -51,7 +51,7 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize(playerObjects);
+	player_->Initialize(playerObjects_);
 
 	//-------------------------------------
 	// パーティクルマネージャ生成
@@ -83,9 +83,7 @@ void GameScene::Finalize()
 
 		skydome_.reset();
 
-		playerBulletObj_.reset();
-
-		playerObj_.reset();
+		playerObjects_.clear();
 	
 		skydomeObj_.reset();
 	}

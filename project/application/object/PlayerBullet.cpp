@@ -1,13 +1,11 @@
 #include "PlayerBullet.h"
 #include <assert.h>
 
-void PlayerBullet::Initialize(Object3d* object,const Vector3& translate)
+void PlayerBullet::Initialize(std::unique_ptr<Object3d> object,const Vector3& translate)
 {
-	this->pObject_ = object;
-
-	transform_.Initilaize();
-	transform_.translate_ = translate;
+	this->object_ = std::move(object);
 	
+	translate_ = translate;
 
 	velocity_ = { 0.0f,0.0,0.5f };
 }
@@ -19,13 +17,13 @@ void PlayerBullet::Update()
 		isDead_ = true;
 	}
 
-	transform_.translate_ += velocity_;
-	transform_.UpdateMatrix();
+	translate_ += velocity_;
+
+	object_->SetTranslate(translate_);
+	object_->Update();
 }
 
 void PlayerBullet::Draw()
 {
-	if (!isDead_) {
-		pObject_->Draw(transform_);
-	}
+	object_->Draw();
 }

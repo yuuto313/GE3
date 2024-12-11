@@ -3,12 +3,12 @@
 #include "ImGuiManager.h"
 #include <assert.h>
 
-void Player::Initialize(const std::vector<Object3d*>& objects)
+void Player::Initialize(std::vector<std::unique_ptr<Object3d>>& objects)
 {
-	this->objects_ = objects;
+	this->objects_ = std::move(objects);
 
 	transform_.Initilaize();
-
+	transform_ = objects_[0]->GetTransform();
 	// モデルのスケールを設定
 	transform_.scale_ = { 0.7f,0.7f,0.7f };
 }
@@ -16,7 +16,7 @@ void Player::Initialize(const std::vector<Object3d*>& objects)
 void Player::Update()
 {
 	// デスフラグの立った弾を削除
-	//bullets_.remove_if([](const std::unique_ptr<PlayerBullet>& bullet) {return bullet->IsDead(); });
+	bullets_.remove_if([](const std::unique_ptr<PlayerBullet>& bullet) {return bullet->IsDead(); });
 
 	// 弾の更新処理
 	for (const auto& bullet : bullets_) {
@@ -25,8 +25,9 @@ void Player::Update()
 
 	// 画面内制限
 	ClampPosition();
-
-	transform_.UpdateMatrix();
+	
+	objects_[0]->SetTransform(transform_);
+	objects_[0]->Update();
 }
 
 void Player::Draw()
@@ -37,7 +38,7 @@ void Player::Draw()
 	}
 
 	// モデル描画
-	objects_[0]->Draw(transform_);
+	objects_[0]->Draw();
 }
 
 void Player::ImGui()
@@ -74,9 +75,12 @@ void Player::ClampPosition()
 
 void Player::Attack()
 {
+	std::unique_ptr<Object3d> object = std::make_unique<Object3d>();
+	object->Initialize(objects_[1]->GetCamera(), objects_[1]->GetModel());
+
 	// 弾を生成
 	std::unique_ptr<PlayerBullet> bullet = std::make_unique<PlayerBullet>();
-	bullet->Initialize(objects_[1], this->transform_.translate_);
+	bullet->Initialize(std::move(object), this->transform_.translate_);
 	bullets_.push_back(std::move(bullet));
 }
 
