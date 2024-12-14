@@ -31,12 +31,17 @@ void GameScene::Initialize()
 	skydomeObj_->Initialize(camera_.get(), "skydome.obj");
 
 	// 必要なサイズにリサイズ
-	playerObjects_.resize(2);
+	playerObjects_.resize(3);
+	// プレイヤー本体
 	playerObjects_[0] = std::make_unique<Object3d>();
 	playerObjects_[0]->Initialize(camera_.get(), "cube.obj");
-
+	// 弾
 	playerObjects_[1] = std::make_unique<Object3d>();
 	playerObjects_[1]->Initialize(camera_.get(), "cube.obj");
+	// レティクル
+	playerObjects_[2] = std::make_unique<Object3d>();
+	playerObjects_[2]->Initialize(camera_.get(), "cube.obj");
+
 
 	//-------------------------------------
 	// 天球の生成

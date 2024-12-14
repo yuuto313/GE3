@@ -44,6 +44,7 @@ public:// ゲッター・セッター
 	const Vector3& GetScale()const { return transform_.scale_; }
 	const Vector3& GetRotate()const { return transform_.rotate_; }
 	const Vector3& GetTranslate()const { return transform_.translate_; }
+	const Matrix4x4& GetMatWorld()const { return transform_.matWorld_; }
 	const Transform& GetTransform()const { return transform_; }
 	Camera* GetCamera()const { return pCamera_; }
 	Model* GetModel() const { return pModel_; }

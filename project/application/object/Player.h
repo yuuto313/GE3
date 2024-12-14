@@ -7,6 +7,8 @@
 #include <vector>
 #include <list>
 
+using namespace GameMath;
+
 class Player
 {
 public:// メンバ関数
@@ -19,12 +21,8 @@ public:// メンバ関数
 
 	void ImGui();
 
-	// 位置を制限する
-	void ClampPosition();
-
 	// 攻撃
 	void Attack();
-
 	// 右
 	void MoveRight();
 	// 左
@@ -33,6 +31,10 @@ public:// メンバ関数
 	void MoveUp();
 	// 下
 	void MoveDown();
+
+	Vector3 GetWorldPosition();
+
+	Vector3 GetReticleWorldPosition(const Transform& transform);
 
 	const Vector3& GetTranslate() { return this->transform_.translate_; }
 
@@ -43,7 +45,18 @@ private:// メンバ変数
 
 
 	float speed_ = 0.3f;
-	Transform transform_ = {};
 
+	// 自機のワールド行列
+	Transform transform_ = {};
+	// 3dレティクル用ワールド行列
+	Transform transformReticle_ = {};
+
+private:// メンバ関数
+
+	// 位置を制限する
+	void ClampPosition();
+
+	// 3Dレティクルの配置
+	void UpdateReticle();
 };
 
