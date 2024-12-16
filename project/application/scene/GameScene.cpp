@@ -30,6 +30,9 @@ void GameScene::Initialize()
 	skydomeObj_ = std::make_unique<Object3d>();
 	skydomeObj_->Initialize(camera_.get(), "skydome.obj");
 
+	enemyObj_ = std::make_unique<Object3d>();
+	enemyObj_->Initialize(camera_.get(), "cube.obj");
+
 	// 必要なサイズにリサイズ
 	playerObjects_.resize(3);
 	// プレイヤー本体
@@ -50,13 +53,19 @@ void GameScene::Initialize()
 	skydome_ = std::make_unique<Skydome>();
 	skydome_->Initialize(skydomeObj_.get());
 
-
 	//-------------------------------------
 	// プレイヤーの生成
 	//-------------------------------------
 
 	player_ = std::make_unique<Player>();
 	player_->Initialize(playerObjects_);
+
+	//-------------------------------------
+	// エネミーの生成
+	//-------------------------------------
+
+	enemy_ = std::make_unique<Enemy>();
+	enemy_->Initialize(enemyObj_.get());
 
 	//-------------------------------------
 	// パーティクルマネージャ生成
@@ -84,6 +93,8 @@ void GameScene::Finalize()
 	// 明示的に解放処理を入れないとメモリリークするため記述
 	// 原因が分かり次第削除
 	{
+		enemy_.reset();
+
 		player_.reset();
 
 		skydome_.reset();
@@ -141,6 +152,12 @@ void GameScene::Update()
 	player_->Update();
 
 	//-------------------------------------
+	// プレイヤーの更新
+	//-------------------------------------
+
+	enemy_->Update();
+
+	//-------------------------------------
 	// パーティクルエミッターの更新
 	//-------------------------------------
 
@@ -161,6 +178,8 @@ void GameScene::Draw()
 	skydome_->Draw();
 
 	player_->Draw();
+
+	enemy_->Draw();
 
 	particleEmitter_->Draw();
 }
