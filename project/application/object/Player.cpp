@@ -15,6 +15,10 @@ void Player::Initialize(std::vector<std::unique_ptr<Object3d>>& objects)
 	// レティクル
 	transformReticle_.Initilaize();
 	transformReticle_ = objects_[2]->GetTransform();
+
+	// クールタイム変数をリセット
+	lastAttackTime_ = std::chrono::steady_clock::now() - std::chrono::seconds(2);
+
 }
 
 void Player::Update()
@@ -129,6 +133,18 @@ Vector3 Player::GetReticleWorldPosition(const Transform& transform)
 
 void Player::Attack()
 {
+	// 現在の時刻を取得
+	auto now = std::chrono::steady_clock::now();
+
+	// 前回の時刻との差を計算
+	float elapsedSeconds = std::chrono::duration<float>(now - lastAttackTime_).count();
+
+	// クールタイム中なら攻撃しない
+	if (elapsedSeconds < bulletCoolTime_) {
+		return;
+	}
+
+
 	// 弾の速度
 	const float kBulletSpeed = 1.0f;
 	Vector3 velocity = { 0.0f,0.0f,kBulletSpeed };
@@ -144,6 +160,9 @@ void Player::Attack()
 	std::unique_ptr<PlayerBullet> bullet = std::make_unique<PlayerBullet>();
 	bullet->Initialize(std::move(object), this->transform_.translate_, velocity);
 	bullets_.push_back(std::move(bullet));
+
+	// 攻撃時刻を更新
+	lastAttackTime_ = now;
 }
 
 void Player::MoveRight()
