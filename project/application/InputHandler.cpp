@@ -30,8 +30,8 @@ std::vector<std::unique_ptr<ICommand>> InputHandler::HandleInput()
     XINPUT_STATE joystick;
 
     if (Input::GetInstance()->GetJoystickState(0, joystick)) {
-        // Aボタン
-        if (joystick.Gamepad.wButtons & XINPUT_GAMEPAD_A) {
+        // RTボタン
+        if (joystick.Gamepad.bRightTrigger) {
             commands.push_back(std::make_unique<AttackCommand>());
         }
 
