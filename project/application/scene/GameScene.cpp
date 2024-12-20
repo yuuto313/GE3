@@ -9,6 +9,7 @@
 
 void GameScene::Initialize()
 {
+
 	//-------------------------------------
 	// InputHandlerクラスの生成
 	//-------------------------------------
@@ -27,18 +28,28 @@ void GameScene::Initialize()
 	// 3dオブジェクト生成
 	//-------------------------------------
 
-	skydomeObject_ = std::make_unique<Object3d>();
-	skydomeObject_->Initialize(camera_.get(), "skydome.obj");
+	skydomeObj_ = std::make_unique<Object3d>();
+	skydomeObj_->Initialize(camera_.get(), "skydome.obj");
 
-	playerObject_ = std::make_unique<Object3d>();
-	playerObject_->Initialize(camera_.get(), "cube.obj");
+	// 必要なサイズにリサイズ
+	playerObjects_.resize(3);
+	// プレイヤー本体
+	playerObjects_[0] = std::make_unique<Object3d>();
+	playerObjects_[0]->Initialize(camera_.get(), "cube.obj");
+	// 弾
+	playerObjects_[1] = std::make_unique<Object3d>();
+	playerObjects_[1]->Initialize(camera_.get(), "cube.obj");
+	// レティクル
+	playerObjects_[2] = std::make_unique<Object3d>();
+	playerObjects_[2]->Initialize(camera_.get(), "cube.obj");
+
 
 	//-------------------------------------
 	// 天球の生成
 	//-------------------------------------
 
 	skydome_ = std::make_unique<Skydome>();
-	skydome_->Initialize(skydomeObject_.get());
+	skydome_->Initialize(skydomeObj_.get());
 
 
 	//-------------------------------------
@@ -46,7 +57,7 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize(playerObject_.get());
+	player_->Initialize(playerObjects_);
 
 	//-------------------------------------
 	// パーティクルマネージャ生成
@@ -78,9 +89,9 @@ void GameScene::Finalize()
 
 		skydome_.reset();
 
-		playerObject_.reset();
+		playerObjects_.clear();
 	
-		skydomeObject_.reset();
+		skydomeObj_.reset();
 	}
 
 }
@@ -102,11 +113,13 @@ void GameScene::Update()
 	//-------------------------------------
 
 	// get Input
-	iCommand_ = inputHandler_->HandleInput();
+	commands_ = inputHandler_->HandleInput();
 
 	// set Command
-	if (this->iCommand_) {
-		iCommand_->Exec(*player_.get());
+	for (const auto& command : commands_) {
+		if (command) {
+			command->Exec(*player_.get());
+		}
 	}
 
 	//-------------------------------------

@@ -1,13 +1,19 @@
 #pragma once
 #include "Transform.h"
 #include "Object3d.h"
-#include "Camera.h"
+#include "PlayerBullet.h"
+
+#include <memory>
+#include <vector>
+#include <list>
+
+using namespace GameMath;
 
 class Player
 {
 public:// メンバ関数
 
-	void Initialize(Object3d* object);
+	void Initialize(std::vector<std::unique_ptr<Object3d>>& objects);
 
 	void Update();
 
@@ -15,9 +21,8 @@ public:// メンバ関数
 
 	void ImGui();
 
-	// 位置を制限する
-	void ClampPosition();
-
+	// 攻撃
+	void Attack();
 	// 右
 	void MoveRight();
 	// 左
@@ -27,14 +32,31 @@ public:// メンバ関数
 	// 下
 	void MoveDown();
 
-	const Vector3& GetTranslate()const { return object_->GetTranslate(); }
+	Vector3 GetWorldPosition();
+
+	Vector3 GetReticleWorldPosition(const Transform& transform);
+
+	const Vector3& GetTranslate() { return this->transform_.translate_; }
 
 private:// メンバ変数
 
-	Object3d* object_ = nullptr;
+	std::vector<std::unique_ptr<Object3d>> objects_;
+	std::list<std::unique_ptr<PlayerBullet>> bullets_;
+
 
 	float speed_ = 0.3f;
-	Transform transform_ = {};
 
+	// 自機のワールド行列
+	Transform transform_ = {};
+	// 3dレティクル用ワールド行列
+	Transform transformReticle_ = {};
+
+private:// メンバ関数
+
+	// 位置を制限する
+	void ClampPosition();
+
+	// 3Dレティクルの配置
+	void UpdateReticle();
 };
 

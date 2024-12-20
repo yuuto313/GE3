@@ -47,12 +47,49 @@ void Object3d::Initialize(Camera* camera, std::string filePath)
 
 }
 
-void Object3d::Update()
+void Object3d::Initialize(Camera* camera, Model* model)
 {
+	this->pObject3dCommon_ = Object3dCommon::GetInstance();
+
 	//-------------------------------------
 	// Transform情報を作る
 	//-------------------------------------
 
+	transform_.Initilaize();
+
+	//-------------------------------------
+	// デフォルトカメラをセットする
+	//-------------------------------------
+
+	this->pCamera_ = pObject3dCommon_->GetDefaultCamera();
+
+	//-------------------------------------
+	// 座標変換行列データ作成
+	//-------------------------------------
+
+	CreateTrasnformationMatrixData();
+
+	//-------------------------------------
+	// 並行光源データ作成
+	//-------------------------------------
+
+	CreateDirectionalLightData();
+
+	//-------------------------------------
+	// カメラを設定
+	//-------------------------------------
+
+	SetCamera(camera);
+
+	//-------------------------------------
+	// モデルの設定
+	//-------------------------------------
+
+	SetModel(model);
+}
+
+void Object3d::Update()
+{
 	CreateWVPMatrix();
 }
 
@@ -133,11 +170,12 @@ void Object3d::CreateDirectionalLightData()
 
 void Object3d::CreateWVPMatrix()
 {
+
 	//-------------------------------------
-	// TransformからWorldMatrixを作る
+	// Transform.matWorldの情報を受け取る
 	//-------------------------------------
 
-	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale_, transform_.rotate_, transform_.translate_);
+	Matrix4x4 worldMatrix = MakeAffineMatrix(transform_.scale_,transform_.rotate_,transform_.translate_);
 
 	//-------------------------------------
 	// worldViewProjectionMatrixを作成

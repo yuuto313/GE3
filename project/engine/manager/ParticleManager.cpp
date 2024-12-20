@@ -31,7 +31,7 @@ void ParticleManager::Initialize(DirectXCommon* dxCommon, SrvManager* srvManager
 	ParticleCommon::GetInstance()->Initialize(pDxCommon_);
 
 	// フィールドを生成
-	accelerationField_.acceleration = { 15.0f,0.0f,0.0f };
+	accelerationField_.acceleration = { 0.0f,-7.0f,-15.0f };
 	accelerationField_.area.min = { -1.0f,-1.0f,-1.0f };
 	accelerationField_.area.max = { 1.0f,1.0f,1.0f };
 

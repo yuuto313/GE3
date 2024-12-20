@@ -22,6 +22,10 @@ namespace GameMath{
 	/// <returns></returns>
 	float cot(float other);
 
+	// ベクトル変換
+	// ベクトルの向きだけを回転させるため、4x4行列の平行移動成分を打ち消して、回転（とスケーリング）のみ反映させたもの
+	Vector3 TransformNormal(const Vector3& v, const Matrix4x4& m);
+
 	/// <summary>
 	/// 単位行列を求める
 	/// </summary>
