@@ -1,7 +1,9 @@
 #pragma once
 #include <wrl.h>
 #include <cassert>
+#include <array>
 #include <windows.h>
+#include <Xinput.h>
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
 
@@ -12,30 +14,8 @@
 /// </summary>
 class Input
 {
-private:// シングルトン設計
+public:// メンバ関数
 
-	static Input* instance;
-
-	/// <summary>
-	/// コンストラクタ、デストラクタの隠蔽
-	/// </summary>
-	Input() = default;
-	~Input() = default;
-
-	/// <summary>
-	/// コピーコンストラクタの封印
-	/// </summary>
-	/// <param name=""></param>
-	Input(Input&) = delete;
-
-	/// <summary>
-	/// コピー代入演算の封印
-	/// </summary>
-	/// <param name=""></param>
-	/// <returns></returns>
-	Input& operator=(Input&) = delete;
-
-public:
 	//namespace省略
 	template <class T> using ComPtr = Microsoft::WRL::ComPtr<T>;
 
@@ -65,15 +45,32 @@ public:
 	/// </summary>
 	/// <param name="keyNumber"></param>
 	/// <returns></returns>
-	bool PushKey(BYTE keyNumber);
+	bool PushKey(BYTE keyNumber) const;
 
 	/// <summary>
 	/// キーのトリガーをチェック
 	/// </summary>
 	/// <param name="keyNumber"></param>
 	/// <returns></returns>
-	bool TriggerKey(BYTE keyNumber);
-private:
+	bool TriggerKey(BYTE keyNumber) const;
+
+	/// <summary>
+	/// 現在のジョイスティック状態を取得する
+	/// </summary>
+	/// <param name="stickNo"></param>
+	/// <param name="out"></param>
+	/// <returns></returns>
+	bool GetJoystickState(int32_t stickNo, XINPUT_STATE& out) const;
+
+	/// <summary>
+	/// 前回のジョイスティック状態を取得する
+	/// </summary>
+	/// <param name="stickNo"></param>
+	/// <param name="out"></param>
+	/// <returns></returns>
+	bool GetJoystickStatePrevious(int32_t stickNo, XINPUT_STATE& out) const;
+
+private:// メンバ変数
 	//DirectInputのインスタンス生成
 	ComPtr<IDirectInput8> directInput_;
 
@@ -85,5 +82,33 @@ private:
 
 	//前回の全キーの状態
 	BYTE keyPre_[256] = {};
+
+	// コントローラー
+	// XInputで扱う状態
+	XINPUT_STATE state_;
+	XINPUT_STATE statePre_;
+
+private:// シングルトン設計
+
+	static Input* instance;
+
+	/// <summary>
+	/// コンストラクタ、デストラクタの隠蔽
+	/// </summary>
+	Input() = default;
+	~Input() = default;
+
+	/// <summary>
+	/// コピーコンストラクタの封印
+	/// </summary>
+	/// <param name=""></param>
+	Input(Input&) = delete;
+
+	/// <summary>
+	/// コピー代入演算の封印
+	/// </summary>
+	/// <param name=""></param>
+	/// <returns></returns>
+	Input& operator=(Input&) = delete;
 };
 
