@@ -30,21 +30,26 @@ void GameScene::Initialize()
 	skydomeObj_ = std::make_unique<Object3d>();
 	skydomeObj_->Initialize(camera_.get(), "skydome.obj");
 
+	// 敵本体
 	enemyObj_ = std::make_unique<Object3d>();
 	enemyObj_->Initialize(camera_.get(), "cube.obj");
-
-	// 必要なサイズにリサイズ
-	playerObjects_.resize(3);
-	// プレイヤー本体
-	playerObjects_[0] = std::make_unique<Object3d>();
-	playerObjects_[0]->Initialize(camera_.get(), "cube.obj");
 	// 弾
-	playerObjects_[1] = std::make_unique<Object3d>();
-	playerObjects_[1]->Initialize(camera_.get(), "cube.obj");
-	// レティクル
-	playerObjects_[2] = std::make_unique<Object3d>();
-	playerObjects_[2]->Initialize(camera_.get(), "cube.obj");
+	enemyBullet_ = std::make_unique<Object3d>();
+	enemyBullet_->Initialize(camera_.get(), "cube.obj");
 
+	std::vector<Object3d*> enemyModels = { enemyObj_.get(),enemyBullet_.get() };
+
+	// プレイヤー本体
+	playerObj_ = std::make_unique<Object3d>();
+	playerObj_->Initialize(camera_.get(), "cube.obj");
+	// 弾
+	playerBullet_ = std::make_unique<Object3d>();
+	playerBullet_->Initialize(camera_.get(), "cube.obj");
+	// レティクル
+	playerReticle_ = std::make_unique<Object3d>();
+	playerReticle_->Initialize(camera_.get(), "cube.obj");
+
+	std::vector<Object3d*> playerModels = { playerObj_.get(),playerBullet_.get(),playerReticle_.get() };
 
 	//-------------------------------------
 	// 天球の生成
@@ -58,14 +63,14 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize(playerObjects_);
+	player_->Initialize(playerModels);
 
 	//-------------------------------------
 	// エネミーの生成
 	//-------------------------------------
 
 	enemy_ = std::make_unique<Enemy>();
-	enemy_->Initialize(enemyObj_.get());
+	enemy_->Initialize(enemyModels);
 
 	//-------------------------------------
 	// パーティクルマネージャ生成
@@ -99,7 +104,11 @@ void GameScene::Finalize()
 
 		skydome_.reset();
 
-		playerObjects_.clear();
+		enemyObj_.reset();
+		enemyBullet_ .reset();
+		playerObj_ .reset();
+		playerBullet_.reset();
+		playerReticle_.reset();
 	
 		skydomeObj_.reset();
 	}
