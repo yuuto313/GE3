@@ -6,6 +6,7 @@
 #include <vector>
 #include <list>
 #include <memory>
+#include <chrono>
 
 using namespace GameMath;
 
@@ -43,8 +44,11 @@ private:// メンバ変数
 	std::vector<Object3d*> objects_;
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
-
 	float speed_ = 0.3f;
+
+	// 弾のクールタイム
+	float bulletCoolTime_ = 0.2f;
+	std::chrono::steady_clock::time_point lastAttackTime_;
 
 	// 自機のワールド行列
 	Transform transform_ = {};
