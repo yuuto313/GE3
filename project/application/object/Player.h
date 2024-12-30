@@ -3,9 +3,9 @@
 #include "Object3d.h"
 #include "PlayerBullet.h"
 
-#include <memory>
 #include <vector>
 #include <list>
+#include <memory>
 #include <chrono>
 
 using namespace GameMath;
@@ -14,7 +14,7 @@ class Player
 {
 public:// メンバ関数
 
-	void Initialize(std::vector<std::unique_ptr<Object3d>>& objects);
+	void Initialize(const std::vector<Object3d*>& objects);
 
 	void Update();
 
@@ -41,7 +41,7 @@ public:// メンバ関数
 
 private:// メンバ変数
 
-	std::vector<std::unique_ptr<Object3d>> objects_;
+	std::vector<Object3d*> objects_;
 	std::list<std::unique_ptr<PlayerBullet>> bullets_;
 
 	float speed_ = 0.3f;

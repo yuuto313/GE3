@@ -104,6 +104,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="application\object\Enemy.cpp" />
+    <ClCompile Include="application\object\EnemyBullet.cpp" />
     <ClCompile Include="engine\3d\Camera.cpp" />
     <ClCompile Include="engine\audio\Audio.cpp" />
     <ClCompile Include="engine\io\D3DResourceLeakChecker.cpp" />
@@ -149,6 +151,8 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\object\PlayerBullet.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="application\object\Enemy.h" />
+    <ClInclude Include="application\object\EnemyBullet.h" />
     <ClInclude Include="engine\struct\DirectionalLight.h" />
     <ClInclude Include="engine\struct\geometory\AABB.h" />
     <ClInclude Include="application\scene\factory\AbstractSceneFactory.h" />

@@ -3,9 +3,9 @@
 #include "ImGuiManager.h"
 #include <assert.h>
 
-void Player::Initialize(std::vector<std::unique_ptr<Object3d>>& objects)
+void Player::Initialize(const std::vector<Object3d*>& objects)
 {
-	this->objects_ = std::move(objects);
+	this->objects_ = objects;
 	// 本体
 	transform_.Initilaize();
 	transform_ = objects_[0]->GetTransform();

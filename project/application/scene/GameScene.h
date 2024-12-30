@@ -12,6 +12,7 @@
 
 #include "Skydome.h"
 #include "Player.h"
+#include "Enemy.h"
 
 #include <memory>
 
@@ -49,7 +50,13 @@ public:// メンバ関数
 
 private:// メンバ変数
 	// モデル
-	std::vector<std::unique_ptr<Object3d>> playerObjects_;
+	std::unique_ptr<Object3d> playerObj_;
+	std::unique_ptr<Object3d> playerBullet_;
+	std::unique_ptr<Object3d> playerReticle_;
+
+	std::unique_ptr<Object3d> enemyObj_;
+	std::unique_ptr<Object3d> enemyBullet_;
+
 	std::unique_ptr<Object3d> skydomeObj_;
 
 
@@ -58,6 +65,7 @@ private:// メンバ変数
 	std::unique_ptr<ParticleEmitter> particleEmitter_;
 	std::unique_ptr<Skydome> skydome_;
 	std::unique_ptr<Player> player_;
+	std::unique_ptr<Enemy> enemy_;
 
 	// コマンド
 	std::unique_ptr<InputHandler> inputHandler_;
