@@ -1,12 +1,10 @@
 #include "EnemyBullet.h"
 
-void EnemyBullet::Initialize(std::unique_ptr<Object3d> object,const Vector3& translation)
+void EnemyBullet::Initialize(std::unique_ptr<Object3d> object,const Vector3& translation, const Vector3& velocity)
 {
 	this->object_ = std::move(object);
 	this->translation_ = translation;
-
-	velocity_ = { 0.0f,0.0f,-0.5f };
-
+	this->velocity_ = velocity;
 }
 
 void EnemyBullet::Update()

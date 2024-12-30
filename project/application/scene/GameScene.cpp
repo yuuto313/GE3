@@ -71,6 +71,7 @@ void GameScene::Initialize()
 
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Initialize(enemyModels);
+	enemy_->SetPlayer(player_.get());
 
 	//-------------------------------------
 	// パーティクルマネージャ生成

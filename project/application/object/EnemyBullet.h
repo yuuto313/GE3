@@ -6,11 +6,13 @@ class EnemyBullet
 {
 public:
 
-	void Initialize(std::unique_ptr<Object3d> object,const Vector3& translation);
+	void Initialize(std::unique_ptr<Object3d> object,const Vector3& translation,const Vector3& velocity);
 
 	void Update();
 
 	void Draw();
+
+	bool IsDead()const { return isDead_; }
 
 private:
 	std::unique_ptr<Object3d> object_;

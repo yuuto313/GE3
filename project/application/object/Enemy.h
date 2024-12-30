@@ -5,6 +5,9 @@
 
 #include <list>
 #include <vector>
+#include <chrono>
+
+class Player;
 
 class Enemy
 {
@@ -28,10 +31,15 @@ public:// メンバ関数
 
 	void LeaveUpdate();
 
+	Vector3 GetWorldPosition();
+
+	void SetPlayer(Player* player) { player_ = player; }
+
 private:// メンバ変数
 
 	std::vector<Object3d*> pObjects_;
 	std::list<std::unique_ptr<EnemyBullet>> bullets_;
+	Player* player_ = nullptr;
 
 	Transform transform_;
 
@@ -45,6 +53,10 @@ private:// メンバ変数
 
 	// メンバ関数ポインタ
 	static void (Enemy::* pFunc[])();
+
+	// 弾のクールタイム
+	float bulletCoolTime_ = 0.5f;
+	std::chrono::steady_clock::time_point lastAttackTime_;
 
 };
 
