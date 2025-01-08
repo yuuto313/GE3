@@ -2,6 +2,7 @@
 #include "Transform.h"
 #include "Object3d.h"
 #include "PlayerBullet.h"
+#include "Sprite.h"
 
 #include <vector>
 #include <list>
@@ -14,7 +15,7 @@ class Player
 {
 public:// メンバ関数
 
-	void Initialize(const std::vector<Object3d*>& objects);
+	void Initialize(const std::vector<Object3d*>& objects,Sprite* sprite);
 
 	void Update();
 
@@ -54,6 +55,9 @@ private:// メンバ変数
 	Transform transform_ = {};
 	// 3dレティクル用ワールド行列
 	Transform transformReticle_ = {};
+	// 2dレティクル用スプライト
+	Sprite* sprite2dReticle_ = nullptr;
+
 
 private:// メンバ関数
 

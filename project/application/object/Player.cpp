@@ -3,7 +3,7 @@
 #include "ImGuiManager.h"
 #include <assert.h>
 
-void Player::Initialize(const std::vector<Object3d*>& objects)
+void Player::Initialize(const std::vector<Object3d*>& objects,Sprite* sprite)
 {
 	this->objects_ = objects;
 	// 本体
@@ -18,6 +18,12 @@ void Player::Initialize(const std::vector<Object3d*>& objects)
 
 	// クールタイム変数をリセット
 	lastAttackTime_ = std::chrono::steady_clock::now() - std::chrono::seconds(2);
+
+	// スプライト生成
+	sprite2dReticle_ = sprite;
+	Vector2 pos = sprite2dReticle_->GetPosition();
+	pos = { 640.0f,360.0f };
+	sprite2dReticle_->SetPosition(pos);
 
 }
 
@@ -45,6 +51,8 @@ void Player::Update()
 	transformReticle_.UpdateMatrix();
 	objects_[2]->SetTransform(transformReticle_);
 	objects_[2]->Update();
+
+	sprite2dReticle_->Update();
 }
 
 void Player::Draw()
@@ -59,6 +67,8 @@ void Player::Draw()
 
 	// レティクル描画
 	objects_[2]->Draw();
+
+	sprite2dReticle_->Draw();
 }
 
 void Player::ImGui()
@@ -108,6 +118,8 @@ void Player::UpdateReticle()
 	offset = Normalize(offset) * kDistancePlayerTo3DReticle;
 	// レティクルの座標を設定
 	transformReticle_.translate_ = GetWorldPosition() + offset;
+
+
 }
 
 Vector3 Player::GetWorldPosition() {

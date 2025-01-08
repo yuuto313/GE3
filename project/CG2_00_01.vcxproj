@@ -126,6 +126,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClCompile Include="application\scene\GameScene.cpp" />
     <ClCompile Include="application\ICommand.cpp" />
     <ClCompile Include="application\InputHandler.cpp" />
+    <ClCompile Include="application\object\LockOn.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="engine\math\GameMath.cpp" />
     <ClCompile Include="engine\io\ResourceObject.cpp" />
@@ -210,6 +211,7 @@ copy "$(WindowsSdkDir)bin\$(TargetPlatformVersion)\x64\dxil.dll" "$(TargetDir)dx
     <ClInclude Include="application\InputHandler.h" />
     <ClInclude Include="application\object\Skydome.h" />
     <ClInclude Include="application\object\PlayerBullet.h" />
+    <ClInclude Include="application\object\LockOn.h" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="externals\imgui\LICENSE.txt" />

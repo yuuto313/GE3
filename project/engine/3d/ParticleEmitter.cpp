@@ -35,11 +35,11 @@ void ParticleEmitter::Update()
 		// 余計に過ぎた時間も加味して頻度計算する
 		frequencyTime_ -= frequency_;
 	}
-
+#ifdef _DEBUG
 	ImGui::Begin("Emitter");
 	ImGui::DragFloat3("EmitterTranslate", &transform_.translate_.x, 0.01f, -100.0f, 100.0f);
 	ImGui::End();
-
+#endif _DEBUG
 }
 
 void ParticleEmitter::Draw()
