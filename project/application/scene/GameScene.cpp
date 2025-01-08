@@ -24,6 +24,13 @@ void GameScene::Initialize()
 	camera_->SetTranslate({ 0.0f,2.5f,-17.6f });
 
 	//-------------------------------------
+	// スプライト生成
+	//-------------------------------------
+
+	sprite2dReticle_ = std::make_unique<Sprite>();
+	sprite2dReticle_->Initialize(SpriteCommon::GetInstance(), "resource/reticle.png");
+
+	//-------------------------------------
 	// 3dオブジェクト生成
 	//-------------------------------------
 
@@ -63,7 +70,7 @@ void GameScene::Initialize()
 	//-------------------------------------
 
 	player_ = std::make_unique<Player>();
-	player_->Initialize(playerModels);
+	player_->Initialize(playerModels, sprite2dReticle_.get());
 
 	//-------------------------------------
 	// エネミーの生成
@@ -72,6 +79,13 @@ void GameScene::Initialize()
 	enemy_ = std::make_unique<Enemy>();
 	enemy_->Initialize(enemyModels);
 	enemy_->SetPlayer(player_.get());
+
+	//-------------------------------------
+	// ロックオンの生成
+	//-------------------------------------
+
+	/*lockOn_ = std::make_unique<LockOn>();
+	lockOn_->Initialize();*/
 
 	//-------------------------------------
 	// パーティクルマネージャ生成
@@ -179,8 +193,10 @@ void GameScene::Update()
 
 void GameScene::ImGui()
 {
+#ifdef _DEBUG
 	camera_->ImGui();
 	player_->ImGui();
+#endif _DEBUG
 }
 
 void GameScene::Draw()
@@ -192,6 +208,8 @@ void GameScene::Draw()
 	enemy_->Draw();
 
 	particleEmitter_->Draw();
+
+	//lockOn_->Draw();
 }
 
 

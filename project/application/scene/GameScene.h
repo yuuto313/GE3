@@ -13,6 +13,7 @@
 #include "Skydome.h"
 #include "Player.h"
 #include "Enemy.h"
+#include "LockOn.h"
 
 #include <memory>
 
@@ -59,6 +60,9 @@ private:// メンバ変数
 
 	std::unique_ptr<Object3d> skydomeObj_;
 
+	// スプライト
+	std::unique_ptr<Sprite> sprite2dReticle_;
+
 
 	// オブジェクト
 	std::unique_ptr<Camera> camera_;
@@ -66,6 +70,7 @@ private:// メンバ変数
 	std::unique_ptr<Skydome> skydome_;
 	std::unique_ptr<Player> player_;
 	std::unique_ptr<Enemy> enemy_;
+	std::unique_ptr<LockOn> lockOn_;
 
 	// コマンド
 	std::unique_ptr<InputHandler> inputHandler_;
